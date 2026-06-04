@@ -1,0 +1,55 @@
+# Secrets & environment
+.env
+.env.*
+!.env.example
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+build/
+dist/
+*.egg-info/
+venv/
+.venv/
+env/
+ENV/
+
+# Vector store / model caches / runtime data
+chroma_db/
+*.sqlite3
+.cache/
+models/
+*.bin
+*.pt
+*.onnx
+
+# Large source documents
+data/
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+~$*
+
+# Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Logs & temp
+*.log
+logs/
+*.tmp
+
+# Tooling (local)
+.claude/settings.local.json
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

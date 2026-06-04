@@ -1,0 +1,75 @@
+# ─────────────────────────────────────────────
+#  Secrets & environment
+# ─────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.env
+.env.txt
+
+# ─────────────────────────────────────────────
+#  Python
+# ─────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# ─────────────────────────────────────────────
+#  Vector store / model caches / runtime data
+# ─────────────────────────────────────────────
+chroma_db/
+*.sqlite3
+.cache/
+models/
+*.bin
+*.pt
+*.onnx
+
+# ─────────────────────────────────────────────
+#  Source documents (large, not for version control)
+# ─────────────────────────────────────────────
+5G 3GPP Files/
+5G Hedex Files/
+data/
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+~$*
+
+# ─────────────────────────────────────────────
+#  Logs & temp
+# ─────────────────────────────────────────────
+*.log
+logs/
+*.tmp
+New Text Document.txt
+
+# ─────────────────────────────────────────────
+#  Tooling (local, machine-specific)
+# ─────────────────────────────────────────────
+.claude/settings.local.json
+
+# ─────────────────────────────────────────────
+#  IDE / OS
+# ─────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

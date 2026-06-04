@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TelecomRAG</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap');
+:root {
+  --bg:#07090f;--bg2:#0c1018;--bg3:#111827;--bg4:#0f1a2e;
+  --neon1:#b06ef3;--neon2:#00ffe0;--neon3:#ff4fa3;
+  --green:#00ffaa;--gold:#fbbf24;--red:#ff3d5a;
+  --text:#ede8ff;--text2:#8b80b0;--text3:#3a3258;
+  --border:rgba(200,40,40,0.18);
+  --f-disp:'Orbitron',sans-serif;--f-body:'Inter',sans-serif;--f-mono:'JetBrains Mono',monospace;
+  --r:10px;--rl:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--f-body);background:var(--bg);color:var(--text)}
+#app{display:flex;flex-direction:column;height:100vh;max-width:1000px;margin:0 auto;
+  border-left:1px solid var(--border);border-right:1px solid var(--border);
+  background-image:linear-gradient(rgba(176,110,243,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(176,110,243,0.025) 1px,transparent 1px);
+  background-size:28px 28px;}
+.hdr{flex-shrink:0;display:flex;align-items:center;gap:16px;padding:16px 22px;
+  background:linear-gradient(135deg,rgba(200,30,30,0.14),rgba(20,160,80,0.07),rgba(240,240,240,0.03));
+  border-bottom:1px solid rgba(200,40,40,0.18);position:relative;z-index:3;}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,#dc2626,#16a34a,#f0f0f0,transparent);opacity:.55;}
+.hdr-logo{width:44px;height:44px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#dc2626,#16a34a);
+  display:flex;align-items:center;justify-content:center;}
+.hdr-title{font-family:var(--f-disp);font-size:13.5px;font-weight:800;letter-spacing:.07em;
+  line-height:1.25;margin-bottom:3px;display:flex;align-items:baseline;gap:0;flex-wrap:wrap;}
+.hdr-status{display:flex;align-items:center;gap:6px;
+  font-family:var(--f-mono);font-size:10px;color:var(--green);}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green),0 0 16px rgba(0,255,170,.4);
+  animation:pulse-dot 2.4s ease-in-out infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+.srcbar{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 24px;
+  background:rgba(12,16,24,.9);border-bottom:1px solid var(--border);z-index:3;}
+.pill{font-family:var(--f-mono);font-size:9.5px;font-weight:500;padding:3px 10px;
+  border-radius:20px;letter-spacing:.08em;text-transform:uppercase;border:1px solid transparent;}
+.pill.p3 {background:rgba(34,197,94,.07); color:#4ade80;border-color:rgba(34,197,94,.28);}
+.pill.ph {background:rgba(220,38,38,.08); color:#f87171;border-color:rgba(220,38,38,.28);}
+.pill.po {background:rgba(245,245,245,.05);color:#d4d4d4;border-color:rgba(245,245,245,.15);}
+.srcbar-r{margin-left:auto;font-family:var(--f-mono);font-size:10px;color:var(--text3)}
+#msgs{flex:1;overflow-y:auto;padding:24px 24px 12px;display:flex;flex-direction:column;gap:20px;
+  scrollbar-width:thin;scrollbar-color:#1e1535 transparent;}
+#msgs::-webkit-scrollbar{width:3px}
+#msgs::-webkit-scrollbar-thumb{background:#22183a;border-radius:2px}
+.row{display:flex;gap:10px;align-items:flex-start;animation:msg-in .28s cubic-bezier(.22,1,.36,1)}
+@keyframes msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.row.user{flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-family:var(--f-disp);font-size:11px;font-weight:800;}
+.av.bot{background:linear-gradient(135deg,var(--neon1),var(--neon2));color:#07090f;
+  box-shadow:0 0 14px rgba(176,110,243,.5);}
+.av.user{background:linear-gradient(135deg,#180d30,#2c1260);color:var(--neon1);
+  border:1px solid rgba(176,110,243,.4);}
+.bub{max-width:90%;width:100%}
+.row.user .bub{max-width:78%;padding:12px 16px;font-size:13.5px;line-height:1.68;
+  background:linear-gradient(135deg,rgba(176,110,243,.13),rgba(0,255,224,.04));
+  border:1px solid rgba(176,110,243,.28);border-radius:var(--rl);border-top-right-radius:2px;color:var(--text);}
+
+/* ── Merged response container */
+.merged{display:flex;flex-direction:column;gap:0;width:100%;
+  border:1px solid rgba(176,110,243,.2);border-radius:var(--rl);overflow:hidden;}
+
+/* ── Evidence divider */
+.evidence-label{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  padding:5px 16px;background:rgba(176,110,243,.06);
+  border-bottom:1px solid rgba(176,110,243,.1);color:var(--text3);}
+.explanation-label{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  padding:5px 16px;background:rgba(251,191,36,.04);
+  border-top:1px solid rgba(251,191,36,.15);
+  border-bottom:1px solid rgba(251,191,36,.1);color:rgba(251,191,36,.5);}
+
+/* ── Source panels */
+.src-panel{padding:14px 16px;border-bottom:1px solid rgba(176,110,243,.08);position:relative;}
+.src-panel:last-child{border-bottom:none}
+.src-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.src-panel.s3::before {background:linear-gradient(90deg,var(--green), transparent 55%)}
+.src-panel.sh::before {background:linear-gradient(90deg,var(--neon1), transparent 55%)}
+.src-panel.so::before {background:linear-gradient(90deg,var(--gold),  transparent 55%)}
+.src-panel.s3{background:rgba(0,255,170,.02)}
+.src-panel.sh{background:rgba(176,110,243,.025)}
+.src-panel.so{background:rgba(251,191,36,.02)}
+.src-panel.empty{opacity:.4}
+
+/* ── Panel header */
+.phdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.badge{display:inline-block;font-family:var(--f-mono);font-size:9px;font-weight:500;
+  padding:2px 8px;border-radius:3px;letter-spacing:.08em;text-transform:uppercase;}
+.b3  {background:rgba(0,255,170,.1);  color:var(--green);border:1px solid rgba(0,255,170,.3)}
+.bh  {background:rgba(176,110,243,.12);color:var(--neon1);border:1px solid rgba(176,110,243,.3)}
+.bo  {background:rgba(251,191,36,.1); color:var(--gold); border:1px solid rgba(251,191,36,.3)}
+.berr{background:rgba(255,61,90,.1);  color:var(--red);  border:1px solid rgba(255,61,90,.3)}
+
+/* Match type tag */
+.mtag{font-family:var(--f-mono);font-size:8.5px;padding:1px 6px;border-radius:3px;
+  letter-spacing:.06em;text-transform:uppercase;}
+.mtag-exact {background:rgba(0,255,170,.12); color:var(--green);border:1px solid rgba(0,255,170,.2)}
+.mtag-vector{background:rgba(176,110,243,.1);color:var(--neon1);border:1px solid rgba(176,110,243,.2)}
+
+/* Confidence pill */
+.cpill{font-family:var(--f-mono);font-size:9px;padding:2px 7px;border-radius:10px;}
+.cp-hi  {background:rgba(0,255,170,.1); color:var(--green);border:1px solid rgba(0,255,170,.25)}
+.cp-med {background:rgba(176,110,243,.1);color:var(--neon1);border:1px solid rgba(176,110,243,.25)}
+.cp-low {background:rgba(251,191,36,.1); color:var(--gold); border:1px solid rgba(251,191,36,.2)}
+.cp-none{background:rgba(255,61,90,.08); color:var(--red);  border:1px solid rgba(255,61,90,.2)}
+.cp-gen {background:rgba(251,191,36,.08);color:rgba(251,191,36,.7);border:1px solid rgba(251,191,36,.15)}
+
+/* Confidence bar */
+.cbar-row{display:flex;align-items:center;gap:6px;margin-left:auto;
+  font-family:var(--f-mono);font-size:10px;color:var(--text3);}
+.cbar{width:60px;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+.cf{height:100%;border-radius:2px;transition:width .9s cubic-bezier(.22,1,.36,1)}
+.cf-hi {background:linear-gradient(90deg,var(--green),var(--neon2));box-shadow:0 0 6px rgba(0,255,170,.4)}
+.cf-md {background:linear-gradient(90deg,var(--neon1),var(--neon3))}
+.cf-lo {background:linear-gradient(90deg,var(--gold),var(--red))}
+
+/* Answer text */
+.ans{font-size:13px;line-height:1.72;color:var(--text);white-space:pre-wrap}
+.ans code,.bub code{font-family:var(--f-mono);font-size:11.5px;background:rgba(176,110,243,.15);
+  padding:1px 6px;border-radius:3px;color:var(--neon2);border:1px solid rgba(0,255,224,.14);}
+.ans strong,.bub strong{color:var(--text);font-weight:500}
+.not-found{font-family:var(--f-mono);font-size:11px;color:var(--text3);font-style:italic}
+
+/* OpenAI disclaimer */
+.oai-note{font-family:var(--f-mono);font-size:9.5px;color:rgba(251,191,36,.45);
+  font-style:italic;margin-bottom:8px;line-height:1.5;}
+
+/* Pipeline trace */
+.trace-btn{display:flex;align-items:center;gap:5px;padding:8px 16px 0;
+  font-family:var(--f-mono);font-size:10px;color:var(--text3);
+  cursor:pointer;letter-spacing:.04em;user-select:none;transition:color .15s;}
+.trace-btn:hover{color:var(--neon2)}
+.tarr{color:var(--neon2);transition:transform .2s;display:inline-block}
+.trace-open .tarr{transform:rotate(90deg)}
+.trace-body{display:none;padding:8px 16px 12px;font-family:var(--f-mono);
+  font-size:10px;line-height:1.85;color:var(--text3);}
+.trace-body.open{display:block}
+.th{font-weight:500}.th.hit{color:var(--green)}.th.miss{color:var(--red)}.th.fb{color:var(--gold)}
+.td{color:var(--text2)}
+
+/* Typing */
+.dots{display:flex;gap:5px;padding:4px 0;align-items:center}
+.dots span{width:7px;height:7px;border-radius:50%;animation:db 1.3s ease-in-out infinite}
+.dots span:nth-child(1){background:var(--neon1)}
+.dots span:nth-child(2){background:var(--neon2);animation-delay:.2s}
+.dots span:nth-child(3){background:var(--neon3);animation-delay:.4s}
+@keyframes db{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+/* Welcome / suggestions */
+.wbub{padding:14px 16px;background:var(--bg4);border:1px solid rgba(176,110,243,.2);
+  border-radius:var(--rl);font-size:13px;line-height:1.68;color:var(--text);}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{font-family:var(--f-mono);font-size:10px;background:transparent;
+  border:1px solid rgba(176,110,243,.28);color:var(--text2);padding:4px 11px;
+  border-radius:5px;cursor:pointer;transition:all .15s;}
+.chip:hover{background:rgba(176,110,243,.1);color:var(--neon1);border-color:var(--neon1)}
+.chip:disabled{opacity:.4;cursor:default;pointer-events:none}
+
+/* Input */
+.inp-area{flex-shrink:0;display:flex;gap:10px;align-items:center;padding:12px 20px;
+  background:rgba(12,16,24,.98);border-top:1px solid var(--border);position:relative;z-index:3;}
+.inp-area::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--neon1),var(--neon2),var(--neon3),transparent);opacity:.45;}
+.inp-wrap{flex:1;background:var(--bg3);border:1px solid rgba(176,110,243,.22);border-radius:var(--r);
+  display:flex;align-items:center;padding:0 14px;transition:border-color .2s,box-shadow .2s;}
+.inp-wrap:focus-within{border-color:var(--neon1);box-shadow:0 0 18px rgba(176,110,243,.22)}
+#qinput{width:100%;background:transparent;border:none;outline:none;color:var(--text);
+  font-family:var(--f-body);font-size:13.5px;padding:10px 0;}
+#qinput::placeholder{color:var(--text3);font-style:italic}
+#qinput:disabled{opacity:.5}
+.send{width:38px;height:38px;flex-shrink:0;border:none;border-radius:var(--r);cursor:pointer;
+  background:linear-gradient(135deg,var(--neon1),var(--neon2));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(176,110,243,.45);transition:transform .12s,box-shadow .15s;}
+.send:hover{transform:scale(1.07);box-shadow:0 0 26px rgba(176,110,243,.65)}
+.send:active{transform:scale(.92)}
+.send:disabled{opacity:.4;cursor:default;transform:none}
+.send svg{width:16px;height:16px;fill:#07090f}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hdr">
+    <div class="hdr-logo">
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:#fff"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 0-2 0v-.07A8.008 8.008 0 0 1 4.07 11H5a1 1 0 0 0 0-2h-.93A8.008 8.008 0 0 1 11 4.07V5a1 1 0 0 0 2 0v-.93A8.008 8.008 0 0 1 19.93 11H19a1 1 0 0 0 0 2h.93A8.008 8.008 0 0 1 13 16.93zM12 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div class="hdr-title">
+        <span style="-webkit-text-fill-color:#ef4444;color:#ef4444">Telecom&nbsp;</span>
+        <span style="-webkit-text-fill-color:#f5f5f5;color:#f5f5f5">Assistant&nbsp;</span>
+        <span style="-webkit-text-fill-color:rgba(245,245,245,0.35);color:rgba(245,245,245,0.35);font-size:12px">::&nbsp;</span>
+        <span style="-webkit-text-fill-color:#22c55e;color:#22c55e">AI RAG Agent</span>
+      </div>
+      <div style="font-family:var(--f-mono);font-size:9.5px;color:rgba(200,180,180,0.55);letter-spacing:.05em;margin-bottom:4px">
+        On-premises assistant for 5G Telecom Consultant &nbsp;·&nbsp;
+        <span style="color:#fbbf24">Tahir Malik</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap" id="hdr-sub">
+        <span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:4px;font-family:var(--f-mono);font-size:9px;background:rgba(220,38,38,0.12);color:#f87171;border:1px solid rgba(220,38,38,0.28)">⬡ qwen2.5:14b</span>
+        <span style="color:rgba(180,160,160,0.25);font-family:var(--f-mono);font-size:10px">·</span>
+        <span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:4px;font-family:var(--f-mono);font-size:9px;background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.25)">≋ BAAI/bge-large-en-v1.5</span>
+        <span style="color:rgba(180,160,160,0.25);font-family:var(--f-mono);font-size:10px">·</span>
+        <span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:4px;font-family:var(--f-mono);font-size:9px;background:rgba(245,245,245,0.06);color:#d4d4d4;border:1px solid rgba(245,245,245,0.15)">⇅ bge-reranker-large</span>
+        <span style="color:rgba(180,160,160,0.25);font-family:var(--f-mono);font-size:10px">·</span>
+        <span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:4px;font-family:var(--f-mono);font-size:9px;background:rgba(251,191,36,0.08);color:#fbbf24;border:1px solid rgba(251,191,36,0.22)">◈ ChromaDB · RTX 5080</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+      <div class="hdr-status"><div class="dot" id="sdot"></div><span id="stxt">CONNECTING</span></div>
+      <div style="font-family:var(--f-mono);font-size:8.5px;color:rgba(200,200,200,0.3);letter-spacing:.08em;text-transform:uppercase">on-premises</div>
+      <div style="font-family:var(--f-mono);font-size:8.5px;color:rgba(200,200,200,0.3);letter-spacing:.08em;text-transform:uppercase">local gpu</div>
+    </div>
+  </header>
+  <div class="srcbar">
+    <div class="pill p3">3GPP — Exact Evidence</div>
+    <div class="pill ph">HedEx — Exact Evidence</div>
+    <div class="pill po">OpenAI — General Explanation</div>
+    <span class="srcbar-r">ALL SOURCES ●</span>
+  </div>
+  <div id="msgs"></div>
+  <div class="inp-area">
+    <div class="inp-wrap">
+      <input id="qinput" type="text" placeholder="Query 3GPP specs or HedEx parameters…" autocomplete="off"/>
+    </div>
+    <button class="send" id="sbtn">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+
+async function checkHealth() {
+  const dot = document.getElementById('sdot');
+  const txt = document.getElementById('stxt');
+  try {
+    const r = await fetch(`${API}/health`, {signal: AbortSignal.timeout(4000)});
+    const d = await r.json();
+    if (d.api === 'ok') {
+      dot.style.cssText = 'background:var(--green);box-shadow:0 0 8px var(--green)';
+      txt.textContent = 'ONLINE'; txt.style.color = 'var(--green)';
+      // Collections confirmed — log only, never overwrite stack chips row
+      if (d.collections_found)
+        console.log('RAG ready:', d.collections_found.join(', '), '| LLM:', d.ollama);
+    } else offline();
+  } catch { offline(); }
+}
+
+function offline() {
+  const dot = document.getElementById('sdot');
+  const txt = document.getElementById('stxt');
+  dot.style.cssText = 'background:var(--red);box-shadow:none';
+  txt.textContent = 'API OFFLINE'; txt.style.color = 'var(--red)';
+}
+
+const msgs  = document.getElementById('msgs');
+const qi    = document.getElementById('qinput');
+const sbtn  = document.getElementById('sbtn');
+const scroll = () => msgs.scrollTop = msgs.scrollHeight;
+
+function setLoading(on) {
+  qi.disabled = on; sbtn.disabled = on;
+  document.querySelectorAll('.chip').forEach(c => c.disabled = on);
+}
+
+function addMsg(role, html) {
+  const row = document.createElement('div');
+  row.className = 'row ' + role;
+  row.innerHTML = role === 'user'
+    ? `<div class="av user">TK</div><div class="bub">${html}</div>`
+    : `<div class="av bot">AI</div><div style="width:100%">${html}</div>`;
+  msgs.appendChild(row); scroll();
+}
+
+function showTyping() {
+  const row = document.createElement('div');
+  row.className = 'row bot'; row.id = 'typing';
+  row.innerHTML = `<div class="av bot">AI</div><div class="wbub">
+    <div style="font-family:var(--f-mono);font-size:10px;color:var(--text3);margin-bottom:6px">
+      querying 3GPP · HedEx · OpenAI…</div>
+    <div class="dots"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(row); scroll();
+}
+function hideTyping() { document.getElementById('typing')?.remove(); }
+
+function fmt(t) {
+  return (t||'')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+function confPct(c) {
+  return {High:88, Medium:65, Low:40, 'Not found':0, 'General Knowledge':50}[c] || 0;
+}
+function confBarCls(c) {
+  if (c==='High')   return 'cf-hi';
+  if (c==='Medium') return 'cf-md';
+  return 'cf-lo';
+}
+function confPillCls(c) {
+  if (c==='High')             return 'cp-hi';
+  if (c==='Medium')           return 'cp-med';
+  if (c==='Low')              return 'cp-low';
+  if (c==='General Knowledge')return 'cp-gen';
+  return 'cp-none';
+}
+
+function matchTags(chunks_meta) {
+  if (!chunks_meta) return '';
+  const types = [...new Set((chunks_meta||[]).map(c => c.match_type||'vector'))];
+  return types.map(t =>
+    `<span class="mtag ${t.startsWith('exact') ? 'mtag-exact' : 'mtag-vector'}">${t}</span>`
+  ).join(' ');
+}
+
+function buildResponse(data) {
+  const tid = 'tr' + Date.now();
+
+  const DEFS = [
+    {src:'3gpp',   bcls:'b3', label:'3GPP — Exact Evidence',       pcls:'s3'},
+    {src:'hedex',  bcls:'bh', label:'HedEx — Exact Evidence',      pcls:'sh'},
+    {src:'openai', bcls:'bo', label:'OpenAI — General Explanation', pcls:'so'},
+  ];
+
+  const ordered = ['3gpp','hedex','openai'].map(s =>
+    data.answers.find(a => a.source === s) ||
+    {source:s, answer:'', has_answer:false, score:0, confidence:'Not found'}
+  );
+
+  let html = '<div class="merged">';
+
+  // Evidence section label
+  html += '<div class="evidence-label">▸ Retrieved Evidence</div>';
+
+  // 3GPP + HedEx panels
+  [0, 1].forEach(i => {
+    const ans = ordered[i];
+    const d   = DEFS[i];
+    const conf = ans.confidence || 'Not found';
+    const pct  = confPct(conf);
+    const has  = ans.has_answer;
+
+    html += `<div class="src-panel ${d.pcls}${has ? '' : ' empty'}">`;
+    html += `<div class="phdr">
+      <span class="badge ${d.bcls}">${d.label}</span>
+      <span class="cpill ${confPillCls(conf)}">${conf}</span>`;
+    if (has) {
+      html += `<div class="cbar-row">
+        <div class="cbar"><div class="cf ${confBarCls(conf)}" style="width:${pct}%"></div></div>
+        <span>${pct}%</span></div>`;
+    }
+    html += `</div>`;
+    html += has
+      ? `<div class="ans">${fmt(ans.answer)}</div>`
+      : `<div class="not-found">◌ Not found in retrieved ${d.label.split('—')[0].trim()} documents</div>`;
+    html += `</div>`;
+  });
+
+  // Explanation section label + OpenAI panel
+  html += '<div class="explanation-label">▸ General Explanation</div>';
+  const oai  = ordered[2];
+  const ohas = oai.has_answer || (oai.answer && oai.answer.length > 10);
+  html += `<div class="src-panel so${ohas ? '' : ' empty'}">`;
+  html += `<div class="phdr">
+    <span class="badge bo">OpenAI — General Explanation</span>
+    <span class="cpill cp-gen">General Knowledge</span></div>`;
+  if (ohas) {
+    html += `<div class="oai-note">Conceptual explanation only — clause numbers, defaults, ranges, and MO paths are grounded only in retrieved evidence above</div>`;
+    html += `<div class="ans">${fmt(oai.answer)}</div>`;
+  } else {
+    html += `<div class="not-found">◌ OpenAI unavailable</div>`;
+  }
+  html += `</div>`;
+
+  // Pipeline trace
+  const traceRows = (data.pipeline_trace||[]).map(h =>
+    `<div><span class="th ${h.cls}">${h.label}</span>&nbsp;<span class="td">${h.detail}</span></div>`
+  ).join('');
+  html += `</div>`;
+  html += `<div class="trace-btn" id="tb${tid}" onclick="toggleTrace('${tid}')">
+    <span class="tarr">▶</span> pipeline trace & debug
+  </div>
+  <div class="trace-body" id="${tid}">${traceRows}</div>`;
+
+  return html;
+}
+
+function toggleTrace(id) {
+  document.getElementById(id).classList.toggle('open');
+  document.getElementById('tb'+id).classList.toggle('trace-open');
+}
+
+function showWelcome() {
+  const html = `<div class="wbub">
+    Every query returns <strong>3GPP Exact Evidence</strong>,
+    <strong>HedEx Exact Evidence</strong>, and
+    <strong>OpenAI General Explanation</strong> — always separated, never mixed.
+    <div class="chips">
+      <button class="chip" onclick="sendQuery('VoNR call drop parameters')">VoNR call drop</button>
+      <button class="chip" onclick="sendQuery('VoNR timers EPS fallback')">VoNR timers</button>
+      <button class="chip" onclick="sendQuery('Call Drop Rate CU VoNR counter')">Call Drop Rate CU VoNR</button>
+      <button class="chip" onclick="sendQuery('NSA ENDC setup failure causes')">ENDC setup failure</button>
+      <button class="chip" onclick="sendQuery('Massive MIMO beamforming NRCellDU')">Massive MIMO</button>
+      <button class="chip" onclick="sendQuery('PdcpSduDiscardTimer HedEx')">PdcpSduDiscardTimer</button>
+      <button class="chip" onclick="sendQuery('5G NR handover A3 event parameters')">NR handover A3</button>
+      <button class="chip" onclick="sendQuery('VoNR RLF radio link failure T310')">VoNR RLF T310</button>
+    </div>
+  </div>`;
+  addMsg('bot', html);
+}
+
+async function sendQuery(q) {
+  q = (q || qi.value).trim();
+  if (!q) return;
+  qi.value = '';
+  addMsg('user', q);
+  setLoading(true);
+  showTyping();
+  try {
+    const res = await fetch(`${API}/query`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({query:q}),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    hideTyping();
+    addMsg('bot', buildResponse(data));
+  } catch(e) {
+    hideTyping();
+    addMsg('bot', `<div class="wbub"><span class="badge berr">Connection error</span><br>
+      Cannot reach <code>${API}</code> — run: <code>python backend/api.py</code></div>`);
+  } finally {
+    setLoading(false);
+  }
+}
+
+sbtn.addEventListener('click', () => sendQuery());
+qi.addEventListener('keydown', e => {
+  if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendQuery(); }
+});
+
+checkHealth();
+showWelcome();
+</script>
+</body>
+</html>
