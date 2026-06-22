@@ -7,7 +7,7 @@ from datetime import datetime
 import feedparser
 import socket
 socket.setdefaulttimeout(8)  # bound each RSS fetch; dead feeds fail fast
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, LLM, Process, Task
 from crewai.tools import tool
 import sys
 from pathlib import Path
@@ -72,6 +72,11 @@ def dedup_dataarch(articles_json: str = "") -> str:
                        "duplicates_removed": dupes,
                        "total_scanned": len(articles)})
 
+
+# Explicit token budgets so large JSON payloads are not truncated.
+HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=8000)
+SONNET = LLM(model="anthropic/claude-sonnet-4-6", max_tokens=16000)
+
 scout = Agent(
     role="Data Architecture Scout",
     goal=(
@@ -84,7 +89,7 @@ scout = Agent(
     ),
     backstory="Senior systems architect covering databases, data engineering, GPU infrastructure, and API design.",
     tools=[fetch_rss_dataarch, dedup_dataarch],
-    llm="anthropic/claude-haiku-4-5",
+    llm=HAIKU,
     verbose=True, max_iter=3,
 )
 
@@ -99,7 +104,7 @@ analyst = Agent(
         "Extract keywords (3-5) and vendors. Keep top 6 per section."
     ),
     backstory="Principal architect with expertise in distributed systems, data engineering, GPU infrastructure, and API platforms.",
-    llm="anthropic/claude-sonnet-4-6",
+    llm=SONNET,
     verbose=True, max_iter=4,
 )
 
@@ -107,7 +112,7 @@ publisher = Agent(
     role="Intelligence Publisher",
     goal="Output ONLY valid JSON. No markdown fences.",
     backstory="Technical editor, zero tolerance for schema violations.",
-    llm="anthropic/claude-sonnet-4-6",
+    llm=SONNET,
     verbose=True, max_iter=2,
 )
 

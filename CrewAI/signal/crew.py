@@ -8,7 +8,7 @@ from datetime import datetime
 import feedparser
 import socket
 socket.setdefaulttimeout(8)  # bound each RSS fetch; dead feeds fail fast
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, LLM, Process, Task
 from crewai.tools import tool
 import sys
 from pathlib import Path
@@ -74,6 +74,11 @@ def dedup(articles_json: str = "") -> str:
                        "duplicates_removed": dupes,
                        "total_scanned": len(articles)})
 
+
+# Explicit token budgets so large JSON payloads are not truncated.
+HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=8000)
+SONNET = LLM(model="anthropic/claude-sonnet-4-6", max_tokens=16000)
+
 scout = Agent(
     role="Telecom Scout",
     goal=(
@@ -87,7 +92,7 @@ scout = Agent(
     ),
     backstory="Senior telecom journalist, 15 years covering global mobile networks.",
     tools=[fetch_rss, dedup],
-    llm="anthropic/claude-haiku-4-5",
+    llm=HAIKU,
     verbose=True, max_iter=3,
 )
 
@@ -101,7 +106,7 @@ analyst = Agent(
         "Keep top 6 per section by score."
     ),
     backstory="Principal RAN architect, Huawei/Ericsson/Nokia multi-vendor GCC experience.",
-    llm="anthropic/claude-sonnet-4-6",
+    llm=SONNET,
     verbose=True, max_iter=4,
 )
 
@@ -109,7 +114,7 @@ publisher = Agent(
     role="Briefing Publisher",
     goal="Output ONLY valid JSON matching TelecomBriefingPayload schema. No markdown.",
     backstory="Meticulous technical editor with zero tolerance for schema violations.",
-    llm="anthropic/claude-sonnet-4-6",
+    llm=SONNET,
     verbose=True, max_iter=2,
 )
 

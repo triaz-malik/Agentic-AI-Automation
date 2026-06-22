@@ -7,7 +7,7 @@ from datetime import datetime
 import feedparser
 import socket
 socket.setdefaulttimeout(8)  # bound each RSS fetch; dead feeds fail fast
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, LLM, Process, Task
 from crewai.tools import tool
 import sys
 from pathlib import Path
@@ -68,6 +68,11 @@ def dedup_dataml(articles_json: str = "") -> str:
                        "duplicates_removed": dupes,
                        "total_scanned": len(articles)})
 
+
+# Explicit token budgets so large JSON payloads are not truncated.
+HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=8000)
+SONNET = LLM(model="anthropic/claude-sonnet-4-6", max_tokens=16000)
+
 scout = Agent(
     role="MLOps & Data Science Scout",
     goal=(
@@ -80,7 +85,7 @@ scout = Agent(
     ),
     backstory="Senior ML engineer covering MLOps platforms, data infrastructure, and cloud ML.",
     tools=[fetch_rss_dataml, dedup_dataml],
-    llm="anthropic/claude-haiku-4-5",
+    llm=HAIKU,
     verbose=True, max_iter=3,
 )
 
@@ -94,7 +99,7 @@ analyst = Agent(
         "keywords (3-5), vendors (platform/tool names). Keep top 6 per section."
     ),
     backstory="Principal ML architect, AWS SAP-C02, Azure DP-100, GCC enterprise experience.",
-    llm="anthropic/claude-sonnet-4-6",
+    llm=SONNET,
     verbose=True, max_iter=4,
 )
 
@@ -102,7 +107,7 @@ publisher = Agent(
     role="Intelligence Publisher",
     goal="Output ONLY valid JSON. No markdown fences. Schema must match exactly.",
     backstory="Technical editor, zero tolerance for schema violations.",
-    llm="anthropic/claude-sonnet-4-6",
+    llm=SONNET,
     verbose=True, max_iter=2,
 )
 
