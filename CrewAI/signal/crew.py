@@ -6,6 +6,8 @@ Agents: Telecom Scout (Haiku) · RAN Analyst (Sonnet) · Publisher (Sonnet)
 import json, logging
 from datetime import datetime
 import feedparser
+import socket
+socket.setdefaulttimeout(8)  # bound each RSS fetch; dead feeds fail fast
 from crewai import Agent, Crew, Process, Task
 from crewai.tools import tool
 import sys
@@ -58,12 +60,22 @@ def fetch_rss(unused: str = "") -> str:
                 })
         except Exception as ex:
             logger.warning(f"RSS error {url}: {ex}")
+    _LAST_FETCH.clear(); _LAST_FETCH.extend(articles)
     return json.dumps(articles)
 
 @tool("dedup")
-def dedup(articles_json: str) -> str:
+def dedup(articles_json: str = "") -> str:
     """Remove already-seen articles via SHA-256 dedup."""
-    articles = json.loads(articles_json)
+    articles = None
+    if articles_json:
+        try:
+            parsed = json.loads(articles_json)
+            if isinstance(parsed, list):
+                articles = parsed
+        except Exception:
+            articles = None
+    if not articles:
+        articles = list(_LAST_FETCH)
     new, dupes = filter_new(articles, _DB_PATH)
     return json.dumps({"new_articles": new,
                        "duplicates_removed": dupes,
@@ -82,7 +94,7 @@ scout = Agent(
     ),
     backstory="Senior telecom journalist, 15 years covering global mobile networks.",
     tools=[fetch_rss, dedup],
-    llm="claude-haiku-4-5",
+    llm="anthropic/claude-haiku-4-5",
     verbose=True, max_iter=3,
 )
 
@@ -96,7 +108,7 @@ analyst = Agent(
         "Keep top 6 per section by score."
     ),
     backstory="Principal RAN architect, Huawei/Ericsson/Nokia multi-vendor GCC experience.",
-    llm="claude-sonnet-4-6",
+    llm="anthropic/claude-sonnet-4-6",
     verbose=True, max_iter=4,
 )
 
@@ -104,7 +116,7 @@ publisher = Agent(
     role="Briefing Publisher",
     goal="Output ONLY valid JSON matching TelecomBriefingPayload schema. No markdown.",
     backstory="Meticulous technical editor with zero tolerance for schema violations.",
-    llm="claude-sonnet-4-6",
+    llm="anthropic/claude-sonnet-4-6",
     verbose=True, max_iter=2,
 )
 
@@ -156,6 +168,20 @@ SCHEMA = """
 }
 """
 
+import re as _re
+
+def _extract_json(text: str) -> dict:
+    """Pull the first balanced JSON object from an LLM response (fenced or prose)."""
+    s = (text or "").strip()
+    m = _re.search(r"```(?:json)?\s*(.*?)```", s, _re.DOTALL)
+    if m:
+        s = m.group(1).strip()
+    start = s.find("{")
+    if start == -1:
+        raise ValueError("no JSON object in model output")
+    return json.JSONDecoder().raw_decode(s, start)[0]
+
+
 def run_crew(issue_number: int, issue_date: str, db_path: str) -> dict:
     global _DB_PATH
     _DB_PATH = db_path
@@ -189,8 +215,7 @@ def run_crew(issue_number: int, issue_date: str, db_path: str) -> dict:
     ).kickoff()
 
     raw = result.raw if hasattr(result, "raw") else str(result)
-    raw = raw.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
-    payload = json.loads(raw)
+    payload = _extract_json(raw)
     # Mark all published entries as seen
     for sec in payload.get("sections", []):
         for e in sec.get("entries", []):

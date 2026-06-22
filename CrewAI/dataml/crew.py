@@ -5,6 +5,8 @@ hikmah-dataml/crew.py
 import json, logging
 from datetime import datetime
 import feedparser
+import socket
+socket.setdefaulttimeout(8)  # bound each RSS fetch; dead feeds fail fast
 from crewai import Agent, Crew, Process, Task
 from crewai.tools import tool
 import sys
@@ -35,6 +37,7 @@ RSS_FEEDS = [
 ]
 
 _DB_PATH = "dataml_news.db"
+_LAST_FETCH = []  # latest fetch; dedup falls back to this
 
 @tool("fetch_rss_dataml")
 def fetch_rss_dataml(unused: str = "") -> str:
@@ -54,12 +57,22 @@ def fetch_rss_dataml(unused: str = "") -> str:
                 })
         except Exception as ex:
             logger.warning(f"RSS error {url}: {ex}")
+    _LAST_FETCH.clear(); _LAST_FETCH.extend(articles)
     return json.dumps(articles)
 
 @tool("dedup_dataml")
-def dedup_dataml(articles_json: str) -> str:
+def dedup_dataml(articles_json: str = "") -> str:
     """Remove already-seen articles via SHA-256 dedup."""
-    articles = json.loads(articles_json)
+    articles = None
+    if articles_json:
+        try:
+            parsed = json.loads(articles_json)
+            if isinstance(parsed, list):
+                articles = parsed
+        except Exception:
+            articles = None
+    if not articles:
+        articles = list(_LAST_FETCH)
     new, dupes = filter_new(articles, _DB_PATH)
     return json.dumps({"new_articles": new,
                        "duplicates_removed": dupes,
@@ -77,7 +90,7 @@ scout = Agent(
     ),
     backstory="Senior ML engineer covering MLOps platforms, data infrastructure, and cloud ML.",
     tools=[fetch_rss_dataml, dedup_dataml],
-    llm="claude-haiku-4-5",
+    llm="anthropic/claude-haiku-4-5",
     verbose=True, max_iter=3,
 )
 
@@ -91,7 +104,7 @@ analyst = Agent(
         "keywords (3-5), vendors (platform/tool names). Keep top 6 per section."
     ),
     backstory="Principal ML architect, AWS SAP-C02, Azure DP-100, GCC enterprise experience.",
-    llm="claude-sonnet-4-6",
+    llm="anthropic/claude-sonnet-4-6",
     verbose=True, max_iter=4,
 )
 
@@ -99,7 +112,7 @@ publisher = Agent(
     role="Intelligence Publisher",
     goal="Output ONLY valid JSON. No markdown fences. Schema must match exactly.",
     backstory="Technical editor, zero tolerance for schema violations.",
-    llm="claude-sonnet-4-6",
+    llm="anthropic/claude-sonnet-4-6",
     verbose=True, max_iter=2,
 )
 
@@ -133,6 +146,20 @@ SCHEMA = """
 }
 """
 
+import re as _re
+
+def _extract_json(text: str) -> dict:
+    """Pull the first balanced JSON object from an LLM response (fenced or prose)."""
+    s = (text or "").strip()
+    m = _re.search(r"```(?:json)?\s*(.*?)```", s, _re.DOTALL)
+    if m:
+        s = m.group(1).strip()
+    start = s.find("{")
+    if start == -1:
+        raise ValueError("no JSON object in model output")
+    return json.JSONDecoder().raw_decode(s, start)[0]
+
+
 def run_crew(issue_number: int, issue_date: str, db_path: str) -> dict:
     global _DB_PATH
     _DB_PATH = db_path
@@ -152,8 +179,7 @@ def run_crew(issue_number: int, issue_date: str, db_path: str) -> dict:
                   process=Process.sequential, verbose=True).kickoff()
 
     raw = result.raw if hasattr(result, "raw") else str(result)
-    raw = raw.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
-    payload = json.loads(raw)
+    payload = _extract_json(raw)
     for sec in payload.get("sections", []):
         for e in sec.get("entries", []):
             mark_seen(e["url"], e["title"], sec["title"], db_path)
