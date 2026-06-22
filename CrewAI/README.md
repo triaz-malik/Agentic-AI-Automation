@@ -36,13 +36,14 @@ Each weekly run writes to two places inside the project folder:
 cd CrewAI
 python -m venv .venv ; .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+python -m playwright install chromium     # one-time, for PDFs
 ```
 
-> **PDF note:** WeasyPrint needs the GTK runtime on Windows. If it is not
-> installed the pipeline still produces all HTML and logs a warning for the PDF
-> step. To enable PDFs install GTK3, then `pip install weasyprint`.
-> (WSL2/Linux: `sudo apt install libpango-1.0-0 libpangocairo-1.0-0
-> libgdk-pixbuf2.0-0 libffi-dev`.)
+> **PDF note:** PDFs are rendered with **Playwright (headless Chromium)** — no
+> GTK or native libraries required, works the same on Windows / macOS / Linux /
+> WSL2. The one-time `playwright install chromium` downloads the browser. If
+> Playwright or Chromium is missing, the pipeline still produces all HTML and
+> just logs a warning for the PDF step.
 
 ## 2. Configure
 

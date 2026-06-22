@@ -59,8 +59,9 @@ Projects (folder · domain · weekday 06:00 GST):
 `main.py` injects `payload["brand"] = BRAND` before rendering.
 
 ## Gotchas
-- WeasyPrint needs GTK; if absent, `generate_pdf` logs a warning and returns `None`
-  (HTML still produced). Don't treat a missing PDF as a hard failure.
+- PDFs render via Playwright headless Chromium (`python -m playwright install chromium`
+  once). If Playwright/Chromium is missing, `generate_pdf` logs a warning and returns
+  `None` (HTML still produced). Don't treat a missing PDF as a hard failure.
 - `load_dotenv(..., override=True)` is required when running multiple projects in one
   process (run_now/run_all) so `ISSUE_NUMBER` etc. don't leak between projects.
 - Editing the design: change `base.html.j2` (shared) — not per-project stubs.
