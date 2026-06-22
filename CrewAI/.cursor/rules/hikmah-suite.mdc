@@ -1,0 +1,66 @@
+---
+description: HIKMAH Suite — 5 CrewAI newsletter projects. Architecture, conventions, and how to run.
+globs:
+alwaysApply: true
+---
+
+# HIKMAH Suite (CrewAI newsletters)
+
+Five self-contained CrewAI pipelines under `CrewAI/`, sharing `hikmah-shared/`.
+Each fetches RSS → SHA-256 dedup → Claude agents score **24 articles/week**
+(4 sections × 6) → renders **separate desktop + mobile HTML and PDF** → commits
+the issue into `CrewAI/<project>/issues/` and emails it.
+
+Projects (folder · domain · weekday 06:00 GST):
+- `signal` · Telecom/5G/RAN · Tue
+- `intelligence` · AI/Agentic/LLM · Wed
+- `dataml` · MLOps/DS · Thu
+- `cloudinfra` · Cloud/Containers/Edge · Fri
+- `dataarch` · Databases/BigData/GPU/API · Sat
+
+## Pipeline (each project's `main.py`)
+1. CrewAI agents (`crew.py`) return a `payload` dict (see schema below). Skipped in `--demo`.
+2. `render_all()` (`hikmah-shared/html_renderer.py`) → `output/issue_NNN_{desktop,mobile}.html`.
+3. `generate_pdf()` (`pdf_generator.py`) → matching PDFs (A4 desktop / 90mm mobile).
+4. `publish_issue()` (`github_publisher.py`) copies into `<repo>/CrewAI/<project>/issues/`,
+   writes that project's `index.html`, and does a **scoped** `git add CrewAI/<project>` +
+   commit + push (never `git add --all`).
+5. `send()` (`email_sender.py`) emails via the **SendGrid v3 API**.
+
+## Conventions
+- One shared Jinja2 template: `hikmah-shared/templates/base.html.j2`, parameterised by
+  `brand` (per-project, from `brand.py`) and driven by the payload. Each project's
+  `templates/hikmah_<project>.html.j2` just `{% extends "base.html.j2" %}`.
+- Brand + section taxonomy live in `<project>/brand.py` (`BRAND`, `SECTIONS`, `VOLUME`, `EDITION`).
+- `variant` is always `"desktop"` or `"mobile"`; output filenames carry the suffix.
+- Section `color_class` is one of `s1`–`s4` (fixed palette); the masthead/brand colour is per-project.
+
+## Secrets & config (all git-ignored)
+- `CrewAI/.env` — SHARED secrets (`ANTHROPIC_API_KEY`, `SENDGRID_API_KEY`, `EMAIL_FROM`, …).
+  Loaded first by every `main.py`.
+- `<project>/config/.env` — per-project (`ISSUE_NUMBER`, `GITHUB_SUBDIR=CrewAI/<project>`,
+  `GITHUB_REPO_PATH`, `GITHUB_PAGES_BASE`, SMTP/email recipients, `DB_PATH`).
+- NEVER hardcode keys or commit any `.env` / `.env.txt` / `*.db`.
+
+## Run
+- Offline preview (no API key): `python run_now.py all --demo`
+- Manual full run: `python run_now.py <project>`  (or `--dry-run` for local-only)
+- Auto (weekly schedulers): `python run_all.py`
+- Single project cron: `cd <project> && python scheduler.py`
+
+## Payload schema (what `crew.py` returns / `--demo` fabricates)
+```
+{ issue_number:int, issue_date:str, volume:str, edition:str,
+  stats:{sources_scanned,duplicates_removed,articles_published,dedup_db_total},
+  ticker_items:[str],
+  sections:[ { id, number, title, eyebrow, meta, color_class,
+    entries:[ { title,url,source,date,summary,arch_impact,keywords[],vendors[],score } ] } ] }
+```
+`main.py` injects `payload["brand"] = BRAND` before rendering.
+
+## Gotchas
+- WeasyPrint needs GTK; if absent, `generate_pdf` logs a warning and returns `None`
+  (HTML still produced). Don't treat a missing PDF as a hard failure.
+- `load_dotenv(..., override=True)` is required when running multiple projects in one
+  process (run_now/run_all) so `ISSUE_NUMBER` etc. don't leak between projects.
+- Editing the design: change `base.html.j2` (shared) — not per-project stubs.

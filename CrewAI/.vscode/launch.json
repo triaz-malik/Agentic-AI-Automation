@@ -1,0 +1,58 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Demo: all (offline, no API key)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_now.py",
+      "args": ["all", "--demo"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Demo: one project (prompt)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_now.py",
+      "args": ["${input:project}", "--demo"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Dry-run: one project (real crew, local only)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_now.py",
+      "args": ["${input:project}", "--dry-run"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Full run: one project (publish + email)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_now.py",
+      "args": ["${input:project}"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Auto: all weekly schedulers",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_all.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "project",
+      "type": "pickString",
+      "description": "Which project?",
+      "options": ["signal", "intelligence", "dataml", "cloudinfra", "dataarch", "all"],
+      "default": "dataarch"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "python.analysis.extraPaths": ["./hikmah-shared"],
+  "python.analysis.autoImportCompletions": true,
+  "python.terminal.activateEnvironment": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true
+  },
+  "search.exclude": {
+    "**/output": true,
+    "**/logs": true,
+    "**/*.db": true
+  },
+  "[python]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
+  "[html]": {
+    "editor.formatOnSave": false
+  }
+}

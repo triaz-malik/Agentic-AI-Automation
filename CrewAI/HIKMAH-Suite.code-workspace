@@ -1,0 +1,18 @@
+{
+  "folders": [
+    { "name": "HIKMAH Suite", "path": "." },
+    { "name": "shared", "path": "hikmah-shared" },
+    { "name": "signal", "path": "signal" },
+    { "name": "intelligence", "path": "intelligence" },
+    { "name": "dataml", "path": "dataml" },
+    { "name": "cloudinfra", "path": "cloudinfra" },
+    { "name": "dataarch", "path": "dataarch" }
+  ],
+  "settings": {
+    "python.analysis.extraPaths": ["./hikmah-shared"],
+    "files.exclude": { "**/__pycache__": true }
+  },
+  "extensions": {
+    "recommendations": ["ms-python.python", "ms-python.debugpy", "samuelcolvin.jinjahtml"]
+  }
+}
