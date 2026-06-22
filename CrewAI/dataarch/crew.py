@@ -17,31 +17,17 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-dataarch.crew")
 
 RSS_FEEDS = [
-    # Database architecture
+    # Databases / BigData / GPU / API
     "https://neon.tech/blog/rss",
     "https://supabase.com/blog/rss",
     "https://www.pingcap.com/blog/rss",
     "https://www.cockroachlabs.com/blog/rss",
-    "https://turso.tech/blog/rss",
-    "https://planetscale.com/blog/rss",
-    # Big data & streaming
-    "https://kafka.apache.org/blog/rss",
-    "https://flink.apache.org/news/rss",
-    "https://spark.apache.org/news/rss",
-    "https://www.databricks.com/blog/category/engineering/rss",
-    "https://redpanda.com/blog/rss",
-    "https://debezium.io/blog/rss",
-    # GPU & compute
-    "https://developer.nvidia.com/blog/rss",
-    "https://www.amd.com/blog/rss",
-    "https://blog.vllm.ai/rss",
-    "https://groq.com/blog/rss",
-    # APIs & automation
-    "https://stripe.com/blog/rss",
-    "https://konghq.com/blog/rss",
-    "https://temporal.io/blog/rss",
-    "https://n8n.io/blog/rss",
-    "https://thenewstack.io/api/rss",
+    "https://planetscale.com/blog/rss.xml",
+    "https://developer.nvidia.com/blog/feed",
+    "https://www.databricks.com/feed",
+    "https://blog.postman.com/feed/",
+    "https://konghq.com/feed",
+    "https://thenewstack.io/feed/",
 ]
 
 _DB_PATH = "dataarch_news.db"

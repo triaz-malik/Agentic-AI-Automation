@@ -17,23 +17,13 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-dataml.crew")
 
 RSS_FEEDS = [
-    "https://www.databricks.com/blog/category/engineering/rss",
-    "https://wandb.ai/blog/rss",
-    "https://docs.getdbt.com/blog/rss",
-    "https://evidentlyai.com/blog/rss",
-    "https://pytorch.org/blog/feed.xml",
+    # MLOps / DS / Analytics
     "https://huggingface.co/blog/feed.xml",
-    "https://weaviate.io/blog/rss",
-    "https://www.pinecone.io/blog/rss",
-    "https://blog.langchain.dev/rss",
-    "https://blog.llamaindex.ai/rss",
-    "https://aws.amazon.com/blogs/machine-learning/feed",
-    "https://techcommunity.microsoft.com/t5/ai-machine-learning-blog/rss",
-    "https://cloud.google.com/blog/products/ai-machine-learning/rss",
-    "https://www.snowflake.com/blog/category/engineering/feed",
-    "https://towardsdatascience.com/feed",
     "https://www.kdnuggets.com/feed",
-    "https://nixtla.io/blog/rss",
+    "https://machinelearningmastery.com/blog/feed/",
+    "https://eugeneyan.com/rss/",
+    "https://towardsdatascience.com/feed",
+    "https://www.databricks.com/feed",
 ]
 
 _DB_PATH = "dataml_news.db"

@@ -17,28 +17,15 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-cloudinfra.crew")
 
 RSS_FEEDS = [
-    # Cloud platforms
+    # Cloud / Containers / Edge
     "https://aws.amazon.com/blogs/aws/feed/",
-    "https://aws.amazon.com/blogs/containers/feed/",
-    "https://techcommunity.microsoft.com/t5/azure-infrastructure-blog/rss",
-    "https://cloud.google.com/blog/products/infrastructure/rss",
-    "https://www.hashicorp.com/blog/rss",
-    # Containers & Kubernetes
+    "https://azure.microsoft.com/en-us/blog/feed/",
     "https://kubernetes.io/feed.xml",
-    "https://www.docker.com/blog/rss/",
-    "https://www.cncf.io/blog/rss/",
-    "https://cilium.io/blog/rss",
-    "https://argoproj.github.io/blog/index.xml",
-    "https://grafana.com/blog/rss/",
-    # Databases & storage
-    "https://www.postgresql.org/about/newsarchive/rss/",
-    "https://www.mongodb.com/blog/rss/",
-    "https://redis.io/blog/rss/",
-    "https://clickhouse.com/blog/rss",
-    # Edge & CDN
+    "https://www.cncf.io/feed/",
+    "https://www.docker.com/blog/feed/",
     "https://blog.cloudflare.com/rss/",
-    "https://www.fastly.com/blog/rss",
-    "https://www.theregister.com/infrastructure/rss",
+    "https://www.hashicorp.com/blog/feed.xml",
+    "https://istio.io/latest/blog/feed.xml",
     "https://thenewstack.io/feed/",
 ]
 

@@ -17,21 +17,17 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-intelligence.crew")
 
 RSS_FEEDS = [
-    "https://www.anthropic.com/news/rss",
-    "https://openai.com/blog/rss",
-    "https://deepmind.google/blog/rss",
-    "https://ai.meta.com/blog/rss",
-    "https://mistral.ai/news/rss",
+    # AI / Agentic / LLM
     "https://huggingface.co/blog/feed.xml",
-    "https://www.deeplearning.ai/the-batch/rss",
-    "https://newsletter.theaiedge.io/feed",
-    "https://www.interconnects.ai/feed",
-    "https://aiweekly.co/issues.rss",
-    "https://arxiv.org/rss/cs.AI",
-    "https://arxiv.org/rss/cs.LG",
-    "https://techcrunch.com/tag/artificial-intelligence/feed/",
-    "https://www.wired.com/feed/tag/artificial-intelligence/rss",
+    "https://openai.com/news/rss.xml",
+    "https://deepmind.google/blog/rss.xml",
+    "https://blog.google/technology/ai/rss/",
+    "https://machinelearning.apple.com/rss.xml",
+    "https://bair.berkeley.edu/blog/feed.xml",
+    "https://www.marktechpost.com/feed/",
     "https://venturebeat.com/category/ai/feed/",
+    "https://thegradient.pub/rss/",
+    "https://simonwillison.net/atom/everything/",
 ]
 
 _DB_PATH = "ai_news.db"

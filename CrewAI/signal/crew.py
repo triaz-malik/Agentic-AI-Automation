@@ -18,19 +18,12 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-signal.crew")
 
 RSS_FEEDS = [
-    "https://www.rcrwireless.com/feed",
+    # Telecom & Networks
     "https://www.lightreading.com/rss.xml",
-    "https://www.fiercewireless.com/rss.xml",
-    "https://telecomtv.com/feed/",
-    "https://www.telecomreview.com/feed/",
-    "https://www.mobileworldlive.com/feed/",
-    "https://www.3gpp.org/news-events/3gpp-news/rss",
-    "https://www.gsma.com/newsroom/feed/",
-    "https://www.ericsson.com/en/blog/rss",
-    "https://www.nokia.com/blog/feed/",
-    "https://spacenews.com/feed/",
-    "https://www.telecomreviewarabia.com/feed/",
-    "https://www.arabianbusiness.com/rss/technology",
+    "https://www.fiercewireless.com/rss/xml",
+    "https://www.fierce-network.com/rss/xml",
+    "https://www.rcrwireless.com/feed",
+    "https://www.theregister.com/networks/headlines.atom",
 ]
 
 SECTION_NAMES = [
