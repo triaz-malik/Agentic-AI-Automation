@@ -1,55 +1,21 @@
-# Secrets & environment
+# secrets — never commit
 .env
-.env.*
-!.env.example
-*.env
+.env.txt
+**/.env
+**/.env.txt
+**/config/.env
+*.key
 
-# Python
+# python
 __pycache__/
-*.py[cod]
-*.so
-build/
-dist/
-*.egg-info/
-venv/
+*.pyc
 .venv/
-env/
-ENV/
+venv/
 
-# Vector store / model caches / runtime data
-chroma_db/
-*.sqlite3
-.cache/
-models/
-*.bin
-*.pt
-*.onnx
-
-# Large source documents
-data/
-*.pdf
-*.doc
-*.docx
-*.xls
-*.xlsx
-*.ppt
-*.pptx
-~$*
-
-# Notebooks checkpoints
-.ipynb_checkpoints/
-
-# Logs & temp
+# generated newsletter output
+**/output/*.html
+**/output/*.pdf
+**/output/payload_*.json
+**/*.db
+**/logs/*.log
 *.log
-logs/
-*.tmp
-
-# Tooling (local)
-.claude/settings.local.json
-
-# IDE / OS
-.idea/
-.vscode/
-*.swp
-.DS_Store
-Thumbs.db

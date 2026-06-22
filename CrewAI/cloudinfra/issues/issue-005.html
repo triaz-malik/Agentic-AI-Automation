@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIKMAH CloudInfra — Weekly Cloud, Containers &amp; Edge Intelligence · Issue #005</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --obs:#0A0E17;--obs2:#111827;--obs3:#1C2535;--obs4:#232E42;
+  /* Brand palette (per project) */
+  --pu:#0EA5E9;--pu2:#0369A1;--pu3:#F0F9FF;
+  --co:#FB7185;--co2:#9F1239;
+  --white:#F4F6FA;--body-bg:#F0F2F7;--card:#FFFFFF;
+  --slate:#8892A4;--slate2:#B8C2CF;
+  --ink:#1A2233;--ink2:#3D4C63;--red:#FF4D6D;
+  --s1:#7C3AED;--s1-bg:#F5F3FF;--s1-b:#DDD6FE;
+  --s2:#DC2626;--s2-bg:#FEF2F2;--s2-b:#FECACA;
+  --s3:#059669;--s3-bg:#ECFDF5;--s3-b:#A7F3D0;
+  --s4:#2563EB;--s4-bg:#EFF6FF;--s4-b:#BFDBFE;
+  --radius:6px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--body-bg);font-family:'Space Grotesk',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6;}
+a{color:inherit;text-decoration:none;}
+.wrap-outer{max-width:1280px;margin:0 auto;background:var(--body-bg);box-shadow:0 0 60px rgba(0,0,0,.06);}
+
+/* ticker */
+.ticker-bar{background:var(--pu);height:32px;overflow:hidden;display:flex;align-items:center;position:sticky;top:0;z-index:100;}
+.ticker-label{background:var(--obs);color:var(--pu);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;padding:0 14px;height:100%;display:flex;align-items:center;flex-shrink:0;}
+.ticker-track{display:flex;animation:ticker 44s linear infinite;white-space:nowrap;}
+.ticker-item{font-size:11px;font-weight:600;letter-spacing:.04em;padding:0 28px;display:flex;align-items:center;gap:10px;color:#fff;}
+.tdot{width:5px;height:5px;border-radius:50%;background:#fff;opacity:.4;flex-shrink:0;}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* masthead */
+.masthead{position:relative;overflow:hidden;background:var(--obs);}
+.masthead-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.masthead-overlay{position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 40% 45%,color-mix(in srgb,var(--pu) 8%,transparent) 0%,transparent 60%),
+             radial-gradient(ellipse 35% 55% at 80% 55%,color-mix(in srgb,var(--co) 6%,transparent) 0%,transparent 55%),
+             linear-gradient(180deg,rgba(10,14,23,.2) 0%,rgba(10,14,23,.85) 72%,var(--obs) 100%);
+  pointer-events:none;z-index:1;}
+.masthead-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:48px 48px 0;}
+.meta-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:12px;}
+.meta-left{display:flex;align-items:center;gap:18px;}
+.issue-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.18em;color:var(--pu);padding:5px 12px;border:1px solid var(--pu2);border-radius:2px;background:color-mix(in srgb,var(--pu) 6%,transparent);}
+.meta-sep{width:1px;height:16px;background:var(--obs3);}
+.meta-date{font-size:12px;color:var(--slate);letter-spacing:.06em;text-transform:uppercase;}
+.meta-right{display:flex;align-items:center;gap:12px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 0 rgba(34,197,94,.5);animation:pulse 2s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.45);}70%{box-shadow:0 0 0 8px rgba(34,197,94,0);}100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}}
+.live-label{font-size:11px;font-weight:600;color:#22C55E;letter-spacing:.08em;text-transform:uppercase;}
+.edition-tag{font-size:11px;color:var(--slate);letter-spacing:.04em;}
+.wordmark-block{margin-bottom:14px;}
+.wordmark-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--pu);margin-bottom:10px;}
+.wordmark-main{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(54px,7vw,104px);line-height:.92;color:var(--white);display:flex;align-items:baseline;gap:18px;}
+.wordmark-main .wm-accent{font-style:italic;color:var(--pu);font-weight:700;}
+.wordmark-sub{display:flex;align-items:center;gap:16px;margin-top:14px;}
+.wordmark-sub span:nth-child(2){font-size:13px;color:var(--slate2);letter-spacing:.04em;}
+.wm-rule,.wm-rule-r{height:1px;background:linear-gradient(90deg,transparent,var(--obs4),transparent);flex:1;}
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--obs3);margin-top:34px;border:1px solid var(--obs3);border-radius:var(--radius);overflow:hidden;}
+.stat-cell{background:var(--obs2);padding:18px 22px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:500;color:var(--white);display:flex;align-items:baseline;gap:4px;}
+.stat-unit{font-size:12px;color:var(--pu);font-weight:500;}
+.stat-label{font-size:10px;color:var(--slate);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;}
+
+/* section nav (desktop) */
+.section-nav{display:flex;gap:4px;padding:0 48px;background:var(--obs);position:relative;z-index:2;border-top:1px solid var(--obs3);}
+.nav-item{display:flex;align-items:center;gap:8px;padding:16px 18px;font-size:12px;font-weight:600;color:var(--slate2);border-bottom:2px solid transparent;transition:all .18s;}
+.nav-item:hover{color:var(--white);}
+.nav-item.active{color:var(--pu);border-bottom-color:var(--pu);}
+.nav-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--slate);}
+.nav-chip{font-size:9px;background:var(--obs3);color:var(--slate2);padding:2px 7px;border-radius:10px;}
+
+/* mobile pills */
+.mobile-pills{display:none;gap:8px;overflow-x:auto;padding:14px 20px;background:var(--obs2);border-top:1px solid var(--obs3);}
+.mobile-pill{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:7px 13px;border-radius:20px;background:var(--obs3);color:var(--slate2);border:1px solid transparent;white-space:nowrap;}
+.mobile-pill.active{background:color-mix(in srgb,var(--pu) 14%,transparent);border-color:var(--pu2);color:var(--pu);}
+.header-rule{height:3px;background:linear-gradient(90deg,var(--pu),var(--co));}
+
+/* content */
+.content-wrap{max-width:1280px;margin:0 auto;padding:44px 48px 0;}
+.section-block{margin-bottom:56px;scroll-margin-top:60px;}
+.section-header{display:flex;align-items:flex-start;gap:18px;padding:18px 22px;border-radius:var(--radius);margin-bottom:24px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.sh-s1{background:var(--s1-bg);border-left:4px solid var(--s1);}
+.sh-s2{background:var(--s2-bg);border-left:4px solid var(--s2);}
+.sh-s3{background:var(--s3-bg);border-left:4px solid var(--s3);}
+.sh-s4{background:var(--s4-bg);border-left:4px solid var(--s4);}
+.section-num{font-family:'JetBrains Mono',monospace;font-size:40px;font-weight:500;color:var(--ink);opacity:.18;line-height:1;}
+.section-title-block{flex:1;}
+.section-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);opacity:.75;margin-bottom:4px;}
+.section-title{font-family:'Playfair Display',serif;font-weight:700;font-size:28px;color:var(--ink);}
+.section-meta{font-size:11px;color:var(--ink2);opacity:.7;margin-top:4px;}
+.section-count-badge{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);background:rgba(0,0,0,.05);padding:6px 12px;border-radius:14px;white-space:nowrap;}
+.entry-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+
+.entry-card{background:var(--card);border:1px solid #E3E8F0;border-radius:var(--radius);padding:22px 22px 18px 26px;position:relative;break-inside:avoid;page-break-inside:avoid;}
+.ec-s1{border-left:4px solid var(--s1);}.ec-s2{border-left:4px solid var(--s2);}
+.ec-s3{border-left:4px solid var(--s3);}.ec-s4{border-left:4px solid var(--s4);}
+.entry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.logo-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.logo-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--ink2);background:#F1F4F9;border:1px solid #E3E8F0;padding:4px 9px;border-radius:4px;}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--pu);}
+.entry-source-link{text-align:right;flex-shrink:0;}
+.source-name{font-size:11px;font-weight:600;color:var(--ink2);}
+.source-date{font-size:10px;color:var(--slate);font-family:'JetBrains Mono',monospace;}
+.source-arrow{font-size:10px;color:var(--pu);font-weight:600;}
+.entry-headline{font-weight:700;font-size:17px;line-height:1.35;color:var(--ink);margin-bottom:10px;}
+.entry-summary{font-size:13.5px;color:var(--ink2);line-height:1.6;margin-bottom:12px;}
+.keyword-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.kpill{font-size:10px;font-weight:500;color:var(--ink2);background:#F1F4F9;border:1px solid #E3E8F0;padding:3px 8px;border-radius:3px;}
+.kpill-s1{background:var(--s1-bg);border-color:var(--s1-b);color:var(--s1);}
+.kpill-s2{background:var(--s2-bg);border-color:var(--s2-b);color:var(--s2);}
+.kpill-s3{background:var(--s3-bg);border-color:var(--s3-b);color:var(--s3);}
+.kpill-s4{background:var(--s4-bg);border-color:var(--s4-b);color:var(--s4);}
+.arch-signal{display:flex;gap:10px;padding:12px 14px;border-radius:var(--radius);margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.asc-s1{background:var(--s1-bg);}.asc-s2{background:var(--s2-bg);}.asc-s3{background:var(--s3-bg);}.asc-s4{background:var(--s4-bg);}
+.as-icon{font-size:16px;line-height:1.3;}
+.as-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);opacity:.7;margin-bottom:3px;}
+.as-text{font-size:12.5px;color:var(--ink2);line-height:1.55;}
+.entry-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;}
+.read-more{font-size:12px;font-weight:600;color:var(--pu);}
+.score-badge{display:flex;align-items:center;gap:8px;}
+.score-bar{width:54px;height:5px;background:#E3E8F0;border-radius:3px;overflow:hidden;}
+.score-fill{height:100%;border-radius:3px;}
+.sf-s1{background:var(--s1);}.sf-s2{background:var(--s2);}.sf-s3{background:var(--s3);}.sf-s4{background:var(--s4);}
+.score-badge span{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--ink2);}
+
+/* footer */
+.site-footer{background:var(--obs);color:var(--slate2);padding:44px 48px 32px;margin-top:40px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding-bottom:28px;border-bottom:1px solid var(--obs3);}
+.footer-brand{font-family:'Playfair Display',serif;font-weight:900;font-size:24px;color:var(--white);}
+.footer-brand .wm-accent{font-style:italic;color:var(--pu);}
+.footer-tag{font-size:12px;color:var(--slate);margin-top:8px;line-height:1.6;max-width:340px;}
+.footer-col h4{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--pu);margin-bottom:12px;}
+.footer-col a,.footer-col div{display:block;font-size:12px;color:var(--slate2);margin-bottom:8px;}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:20px;font-size:11px;color:var(--slate);flex-wrap:wrap;}
+.hosted-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.hosted-links a{font-size:11px;font-weight:600;padding:7px 14px;border-radius:3px;border:1px solid var(--pu2);color:var(--pu);}
+
+@media print{
+  .ticker-bar,.section-nav,.mobile-pills{display:none !important;}
+  .masthead-canvas{display:none !important;}
+  .read-more,.hosted-links{display:none !important;}
+  body{background:#fff !important;}
+  .entry-card{break-inside:avoid;}
+}
+</style>
+</head>
+<body class="variant-desktop">
+<div class="wrap-outer">
+
+<div class="ticker-bar">
+  <div class="ticker-label">CLOUD FEED</div>
+  <div style="overflow:hidden;flex:1;">
+    <div class="ticker-track">
+      <div class="ticker-item"><span class="tdot"></span>Cloud Platforms - latest developments curated this week</div>
+      <div class="ticker-item"><span class="tdot"></span>Containers &amp; Kubernetes - latest developments curated this week</div>
+      <div class="ticker-item"><span class="tdot"></span>Databases &amp; Storage - latest developments curated this week</div>
+      <div class="ticker-item"><span class="tdot"></span>Edge, CDN &amp; Telecom Cloud - latest developments curated this week</div>
+      <div class="ticker-item"><span class="tdot"></span>Cloud Platforms - latest developments curated this week</div>
+      <div class="ticker-item"><span class="tdot"></span>Containers &amp; Kubernetes - latest developments curated this week</div>
+      <div class="ticker-item"><span class="tdot"></span>Databases &amp; Storage - latest developments curated this week</div>
+      <div class="ticker-item"><span class="tdot"></span>Edge, CDN &amp; Telecom Cloud - latest developments curated this week</div>
+    </div>
+  </div>
+</div>
+
+<header class="masthead" role="banner">
+  <svg class="masthead-canvas" viewBox="0 0 1440 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><filter id="b7"><feGaussianBlur stdDeviation="7"/></filter></defs>
+    <ellipse cx="500" cy="210" rx="380" ry="200" fill="color-mix(in srgb,#0EA5E9 6%,transparent)" filter="url(#b7)"/>
+    <ellipse cx="1050" cy="200" rx="300" ry="160" fill="color-mix(in srgb,#FB7185 5%,transparent)" filter="url(#b7)"/>
+    <line x1="120" y1="100" x2="1320" y2="100" stroke="#0EA5E9" stroke-opacity=".14" stroke-width="1"/>
+    <line x1="120" y1="150" x2="1320" y2="150" stroke="#0EA5E9" stroke-opacity=".14" stroke-width="1"/>
+    <line x1="120" y1="210" x2="1320" y2="210" stroke="#0EA5E9" stroke-opacity=".14" stroke-width="1"/>
+    <line x1="120" y1="270" x2="1320" y2="270" stroke="#0EA5E9" stroke-opacity=".14" stroke-width="1"/>
+    <line x1="120" y1="320" x2="1320" y2="320" stroke="#0EA5E9" stroke-opacity=".14" stroke-width="1"/>
+    <line x1="320" y1="100" x2="320" y2="320" stroke="#0EA5E9" stroke-opacity=".10" stroke-width="1"/>
+    <circle cx="320" cy="210" r="5" fill="#0EA5E9" opacity=".8"/>
+    <line x1="560" y1="100" x2="560" y2="320" stroke="#0EA5E9" stroke-opacity=".10" stroke-width="1"/>
+    <circle cx="560" cy="210" r="5" fill="#0EA5E9" opacity=".8"/>
+    <line x1="800" y1="100" x2="800" y2="320" stroke="#0EA5E9" stroke-opacity=".10" stroke-width="1"/>
+    <circle cx="800" cy="210" r="5" fill="#0EA5E9" opacity=".8"/>
+    <line x1="1040" y1="100" x2="1040" y2="320" stroke="#0EA5E9" stroke-opacity=".10" stroke-width="1"/>
+    <circle cx="1040" cy="210" r="5" fill="#0EA5E9" opacity=".8"/>
+    <line x1="1200" y1="100" x2="1200" y2="320" stroke="#0EA5E9" stroke-opacity=".10" stroke-width="1"/>
+    <circle cx="1200" cy="210" r="5" fill="#0EA5E9" opacity=".8"/>
+  </svg>
+  <div class="masthead-overlay"></div>
+  <div class="masthead-inner">
+    <div class="meta-row">
+      <div class="meta-left">
+        <div class="issue-badge">Issue #005</div>
+        <div class="meta-sep"></div>
+        <div class="meta-date">22 Jun 2026 &nbsp;·&nbsp; Vol. I</div>
+      </div>
+      <div class="meta-right">
+        <div class="live-dot"></div>
+        <div class="live-label">Live</div>
+        <div class="edition-tag">Global Edition &nbsp;·&nbsp; 24 Articles Curated</div>
+      </div>
+    </div>
+    <div class="wordmark-block">
+      <div class="wordmark-eyebrow">Weekly Cloud, Containers &amp; Edge Intelligence</div>
+      <div class="wordmark-main"><span>HIKMAH</span><span class="wm-accent">CloudInfra</span></div>
+      <div class="wordmark-sub"><span class="wm-rule"></span><span>Infrastructure Intelligence for Platform Engineers</span><span class="wm-rule-r"></span></div>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-cell"><div class="stat-num">24<span class="stat-unit">art.</span></div><div class="stat-label">Articles Curated</div></div>
+      <div class="stat-cell"><div class="stat-num">740<span class="stat-unit">src</span></div><div class="stat-label">Sources Scanned</div></div>
+      <div class="stat-cell"><div class="stat-num">312<span class="stat-unit">dup</span></div><div class="stat-label">Duplicates Removed</div></div>
+      <div class="stat-cell"><div class="stat-num">4<span class="stat-unit">sec</span></div><div class="stat-label">Coverage Domains</div></div>
+    </div>
+  </div>
+  <nav class="section-nav">
+    <a class="nav-item active" href="#s1"><span class="nav-num">01</span>Cloud Platforms<span class="nav-chip">6</span></a>
+    <a class="nav-item " href="#s2"><span class="nav-num">02</span>Containers &amp; Kubernetes<span class="nav-chip">6</span></a>
+    <a class="nav-item " href="#s3"><span class="nav-num">03</span>Databases &amp; Storage<span class="nav-chip">6</span></a>
+    <a class="nav-item " href="#s4"><span class="nav-num">04</span>Edge, CDN &amp; Telecom Cloud<span class="nav-chip">6</span></a>
+  </nav>
+</header>
+
+<div class="mobile-pills">
+  <button class="mobile-pill active">01 · Cloud Platforms</button>
+  <button class="mobile-pill ">02 · Containers &amp; Kubernetes</button>
+  <button class="mobile-pill ">03 · Databases &amp; Storage</button>
+  <button class="mobile-pill ">04 · Edge, CDN &amp; Telecom Cloud</button>
+</div>
+<div class="header-rule"></div>
+
+<main class="content-wrap">
+  <section class="section-block" id="s1">
+    <div class="section-header sh-s1">
+      <div class="section-num">01</div>
+      <div class="section-title-block">
+        <div class="section-eyebrow">AWS · Azure · GCP · Multi-Cloud · IaC · FinOps · Serverless</div>
+        <div class="section-title">Cloud Platforms</div>
+        <div class="section-meta">AWS · Microsoft Azure · Google Cloud · HashiCorp · Pulumi</div>
+      </div>
+      <div class="section-count-badge">6 entries</div>
+    </div>
+    <div class="entry-grid">
+      <article class="entry-card ec-s1">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>AWS</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Microsoft Azure</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">AWS</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Cloud Platforms: Sample Headline 1 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s1">AWS</span>
+          <span class="kpill kpill-s1">Azure</span>
+          <span class="kpill ">GCP</span>
+          <span class="kpill ">Multi-Cloud</span>
+          <span class="kpill ">IaC</span>
+        </div>
+        <div class="arch-signal asc-s1">
+          <div class="as-icon">☁️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s1" style="width:95%"></div></div><span>95</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s1">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>AWS</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Microsoft Azure</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">AWS</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Cloud Platforms: Sample Headline 2 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s1">AWS</span>
+          <span class="kpill kpill-s1">Azure</span>
+          <span class="kpill ">GCP</span>
+          <span class="kpill ">Multi-Cloud</span>
+          <span class="kpill ">IaC</span>
+        </div>
+        <div class="arch-signal asc-s1">
+          <div class="as-icon">☁️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s1" style="width:92%"></div></div><span>92</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s1">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>AWS</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Microsoft Azure</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">AWS</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Cloud Platforms: Sample Headline 3 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s1">AWS</span>
+          <span class="kpill kpill-s1">Azure</span>
+          <span class="kpill ">GCP</span>
+          <span class="kpill ">Multi-Cloud</span>
+          <span class="kpill ">IaC</span>
+        </div>
+        <div class="arch-signal asc-s1">
+          <div class="as-icon">☁️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s1" style="width:89%"></div></div><span>89</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s1">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>AWS</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Microsoft Azure</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">AWS</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Cloud Platforms: Sample Headline 4 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s1">AWS</span>
+          <span class="kpill kpill-s1">Azure</span>
+          <span class="kpill ">GCP</span>
+          <span class="kpill ">Multi-Cloud</span>
+          <span class="kpill ">IaC</span>
+        </div>
+        <div class="arch-signal asc-s1">
+          <div class="as-icon">☁️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s1" style="width:86%"></div></div><span>86</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s1">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>AWS</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Microsoft Azure</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">AWS</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Cloud Platforms: Sample Headline 5 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s1">AWS</span>
+          <span class="kpill kpill-s1">Azure</span>
+          <span class="kpill ">GCP</span>
+          <span class="kpill ">Multi-Cloud</span>
+          <span class="kpill ">IaC</span>
+        </div>
+        <div class="arch-signal asc-s1">
+          <div class="as-icon">☁️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s1" style="width:83%"></div></div><span>83</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s1">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>AWS</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Microsoft Azure</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">AWS</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Cloud Platforms: Sample Headline 6 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s1">AWS</span>
+          <span class="kpill kpill-s1">Azure</span>
+          <span class="kpill ">GCP</span>
+          <span class="kpill ">Multi-Cloud</span>
+          <span class="kpill ">IaC</span>
+        </div>
+        <div class="arch-signal asc-s1">
+          <div class="as-icon">☁️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s1" style="width:80%"></div></div><span>80</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <section class="section-block" id="s2">
+    <div class="section-header sh-s2">
+      <div class="section-num">02</div>
+      <div class="section-title-block">
+        <div class="section-eyebrow">Docker · Kubernetes · Helm · Service Mesh · WASM · OCI</div>
+        <div class="section-title">Containers &amp; Kubernetes</div>
+        <div class="section-meta">Docker · CNCF · Istio · Cilium · Argo · Crossplane</div>
+      </div>
+      <div class="section-count-badge">6 entries</div>
+    </div>
+    <div class="entry-grid">
+      <article class="entry-card ec-s2">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Docker</span>
+            <span class="logo-chip"><span class="chip-dot"></span>CNCF</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Docker</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Containers &amp; Kubernetes: Sample Headline 1 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s2">Docker</span>
+          <span class="kpill kpill-s2">Kubernetes</span>
+          <span class="kpill ">Helm</span>
+          <span class="kpill ">Service Mesh</span>
+          <span class="kpill ">WASM</span>
+        </div>
+        <div class="arch-signal asc-s2">
+          <div class="as-icon">📦</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s2" style="width:95%"></div></div><span>95</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s2">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Docker</span>
+            <span class="logo-chip"><span class="chip-dot"></span>CNCF</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Docker</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Containers &amp; Kubernetes: Sample Headline 2 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s2">Docker</span>
+          <span class="kpill kpill-s2">Kubernetes</span>
+          <span class="kpill ">Helm</span>
+          <span class="kpill ">Service Mesh</span>
+          <span class="kpill ">WASM</span>
+        </div>
+        <div class="arch-signal asc-s2">
+          <div class="as-icon">📦</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s2" style="width:92%"></div></div><span>92</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s2">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Docker</span>
+            <span class="logo-chip"><span class="chip-dot"></span>CNCF</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Docker</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Containers &amp; Kubernetes: Sample Headline 3 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s2">Docker</span>
+          <span class="kpill kpill-s2">Kubernetes</span>
+          <span class="kpill ">Helm</span>
+          <span class="kpill ">Service Mesh</span>
+          <span class="kpill ">WASM</span>
+        </div>
+        <div class="arch-signal asc-s2">
+          <div class="as-icon">📦</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s2" style="width:89%"></div></div><span>89</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s2">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Docker</span>
+            <span class="logo-chip"><span class="chip-dot"></span>CNCF</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Docker</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Containers &amp; Kubernetes: Sample Headline 4 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s2">Docker</span>
+          <span class="kpill kpill-s2">Kubernetes</span>
+          <span class="kpill ">Helm</span>
+          <span class="kpill ">Service Mesh</span>
+          <span class="kpill ">WASM</span>
+        </div>
+        <div class="arch-signal asc-s2">
+          <div class="as-icon">📦</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s2" style="width:86%"></div></div><span>86</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s2">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Docker</span>
+            <span class="logo-chip"><span class="chip-dot"></span>CNCF</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Docker</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Containers &amp; Kubernetes: Sample Headline 5 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s2">Docker</span>
+          <span class="kpill kpill-s2">Kubernetes</span>
+          <span class="kpill ">Helm</span>
+          <span class="kpill ">Service Mesh</span>
+          <span class="kpill ">WASM</span>
+        </div>
+        <div class="arch-signal asc-s2">
+          <div class="as-icon">📦</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s2" style="width:83%"></div></div><span>83</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s2">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Docker</span>
+            <span class="logo-chip"><span class="chip-dot"></span>CNCF</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Docker</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Containers &amp; Kubernetes: Sample Headline 6 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s2">Docker</span>
+          <span class="kpill kpill-s2">Kubernetes</span>
+          <span class="kpill ">Helm</span>
+          <span class="kpill ">Service Mesh</span>
+          <span class="kpill ">WASM</span>
+        </div>
+        <div class="arch-signal asc-s2">
+          <div class="as-icon">📦</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s2" style="width:80%"></div></div><span>80</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <section class="section-block" id="s3">
+    <div class="section-header sh-s3">
+      <div class="section-num">03</div>
+      <div class="section-title-block">
+        <div class="section-eyebrow">PostgreSQL · MongoDB · Redis · ClickHouse · S3 · Object Storage</div>
+        <div class="section-title">Databases &amp; Storage</div>
+        <div class="section-meta">PostgreSQL · MongoDB · Redis · ClickHouse · Apache Arrow</div>
+      </div>
+      <div class="section-count-badge">6 entries</div>
+    </div>
+    <div class="entry-grid">
+      <article class="entry-card ec-s3">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>PostgreSQL</span>
+            <span class="logo-chip"><span class="chip-dot"></span>MongoDB</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">PostgreSQL</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Databases &amp; Storage: Sample Headline 1 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s3">PostgreSQL</span>
+          <span class="kpill kpill-s3">MongoDB</span>
+          <span class="kpill ">Redis</span>
+          <span class="kpill ">ClickHouse</span>
+          <span class="kpill ">S3</span>
+        </div>
+        <div class="arch-signal asc-s3">
+          <div class="as-icon">🗄️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s3" style="width:95%"></div></div><span>95</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s3">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>PostgreSQL</span>
+            <span class="logo-chip"><span class="chip-dot"></span>MongoDB</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">PostgreSQL</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Databases &amp; Storage: Sample Headline 2 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s3">PostgreSQL</span>
+          <span class="kpill kpill-s3">MongoDB</span>
+          <span class="kpill ">Redis</span>
+          <span class="kpill ">ClickHouse</span>
+          <span class="kpill ">S3</span>
+        </div>
+        <div class="arch-signal asc-s3">
+          <div class="as-icon">🗄️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s3" style="width:92%"></div></div><span>92</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s3">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>PostgreSQL</span>
+            <span class="logo-chip"><span class="chip-dot"></span>MongoDB</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">PostgreSQL</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Databases &amp; Storage: Sample Headline 3 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s3">PostgreSQL</span>
+          <span class="kpill kpill-s3">MongoDB</span>
+          <span class="kpill ">Redis</span>
+          <span class="kpill ">ClickHouse</span>
+          <span class="kpill ">S3</span>
+        </div>
+        <div class="arch-signal asc-s3">
+          <div class="as-icon">🗄️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s3" style="width:89%"></div></div><span>89</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s3">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>PostgreSQL</span>
+            <span class="logo-chip"><span class="chip-dot"></span>MongoDB</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">PostgreSQL</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Databases &amp; Storage: Sample Headline 4 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s3">PostgreSQL</span>
+          <span class="kpill kpill-s3">MongoDB</span>
+          <span class="kpill ">Redis</span>
+          <span class="kpill ">ClickHouse</span>
+          <span class="kpill ">S3</span>
+        </div>
+        <div class="arch-signal asc-s3">
+          <div class="as-icon">🗄️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s3" style="width:86%"></div></div><span>86</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s3">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>PostgreSQL</span>
+            <span class="logo-chip"><span class="chip-dot"></span>MongoDB</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">PostgreSQL</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Databases &amp; Storage: Sample Headline 5 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s3">PostgreSQL</span>
+          <span class="kpill kpill-s3">MongoDB</span>
+          <span class="kpill ">Redis</span>
+          <span class="kpill ">ClickHouse</span>
+          <span class="kpill ">S3</span>
+        </div>
+        <div class="arch-signal asc-s3">
+          <div class="as-icon">🗄️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s3" style="width:83%"></div></div><span>83</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s3">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>PostgreSQL</span>
+            <span class="logo-chip"><span class="chip-dot"></span>MongoDB</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">PostgreSQL</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Databases &amp; Storage: Sample Headline 6 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s3">PostgreSQL</span>
+          <span class="kpill kpill-s3">MongoDB</span>
+          <span class="kpill ">Redis</span>
+          <span class="kpill ">ClickHouse</span>
+          <span class="kpill ">S3</span>
+        </div>
+        <div class="arch-signal asc-s3">
+          <div class="as-icon">🗄️</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s3" style="width:80%"></div></div><span>80</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <section class="section-block" id="s4">
+    <div class="section-header sh-s4">
+      <div class="section-num">04</div>
+      <div class="section-title-block">
+        <div class="section-eyebrow">Edge Compute · CDN · WASM at Edge · MEC · Telecom Cloud · vRAN</div>
+        <div class="section-title">Edge, CDN &amp; Telecom Cloud</div>
+        <div class="section-meta">Cloudflare · Fastly · AWS Outposts · Azure Edge · MEC</div>
+      </div>
+      <div class="section-count-badge">6 entries</div>
+    </div>
+    <div class="entry-grid">
+      <article class="entry-card ec-s4">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Cloudflare</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Fastly</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Cloudflare</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Edge, CDN &amp; Telecom Cloud: Sample Headline 1 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s4">Edge Compute</span>
+          <span class="kpill kpill-s4">CDN</span>
+          <span class="kpill ">WASM at Edge</span>
+          <span class="kpill ">MEC</span>
+          <span class="kpill ">Telecom Cloud</span>
+        </div>
+        <div class="arch-signal asc-s4">
+          <div class="as-icon">🌐</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s4" style="width:95%"></div></div><span>95</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s4">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Cloudflare</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Fastly</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Cloudflare</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Edge, CDN &amp; Telecom Cloud: Sample Headline 2 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s4">Edge Compute</span>
+          <span class="kpill kpill-s4">CDN</span>
+          <span class="kpill ">WASM at Edge</span>
+          <span class="kpill ">MEC</span>
+          <span class="kpill ">Telecom Cloud</span>
+        </div>
+        <div class="arch-signal asc-s4">
+          <div class="as-icon">🌐</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s4" style="width:92%"></div></div><span>92</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s4">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Cloudflare</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Fastly</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Cloudflare</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Edge, CDN &amp; Telecom Cloud: Sample Headline 3 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s4">Edge Compute</span>
+          <span class="kpill kpill-s4">CDN</span>
+          <span class="kpill ">WASM at Edge</span>
+          <span class="kpill ">MEC</span>
+          <span class="kpill ">Telecom Cloud</span>
+        </div>
+        <div class="arch-signal asc-s4">
+          <div class="as-icon">🌐</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s4" style="width:89%"></div></div><span>89</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s4">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Cloudflare</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Fastly</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Cloudflare</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Edge, CDN &amp; Telecom Cloud: Sample Headline 4 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s4">Edge Compute</span>
+          <span class="kpill kpill-s4">CDN</span>
+          <span class="kpill ">WASM at Edge</span>
+          <span class="kpill ">MEC</span>
+          <span class="kpill ">Telecom Cloud</span>
+        </div>
+        <div class="arch-signal asc-s4">
+          <div class="as-icon">🌐</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s4" style="width:86%"></div></div><span>86</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s4">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Cloudflare</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Fastly</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Cloudflare</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Edge, CDN &amp; Telecom Cloud: Sample Headline 5 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s4">Edge Compute</span>
+          <span class="kpill kpill-s4">CDN</span>
+          <span class="kpill ">WASM at Edge</span>
+          <span class="kpill ">MEC</span>
+          <span class="kpill ">Telecom Cloud</span>
+        </div>
+        <div class="arch-signal asc-s4">
+          <div class="as-icon">🌐</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s4" style="width:83%"></div></div><span>83</span></div>
+        </div>
+      </article>
+      <article class="entry-card ec-s4">
+        <div class="entry-top">
+          <div class="logo-chips">
+            <span class="logo-chip"><span class="chip-dot"></span>Cloudflare</span>
+            <span class="logo-chip"><span class="chip-dot"></span>Fastly</span>
+          </div>
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">Cloudflare</div>
+            <div class="source-date">22 Jun 2026</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">Edge, CDN &amp; Telecom Cloud: Sample Headline 6 - What Engineers Should Know</div>
+        <div class="entry-summary">This is placeholder copy used by --demo so you can preview the desktop and mobile layouts without running CrewAI or spending tokens. Replace with a real run once your ANTHROPIC_API_KEY is set.</div>
+        <div class="keyword-pills">
+          <span class="kpill kpill-s4">Edge Compute</span>
+          <span class="kpill kpill-s4">CDN</span>
+          <span class="kpill ">WASM at Edge</span>
+          <span class="kpill ">MEC</span>
+          <span class="kpill ">Telecom Cloud</span>
+        </div>
+        <div class="arch-signal asc-s4">
+          <div class="as-icon">🌐</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">Demo signal text: the concrete decision or architectural implication the reader should take away from this item.</div>
+          </div>
+        </div>
+        <div class="entry-footer">
+          <a href="https://example.com/article" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-s4" style="width:80%"></div></div><span>80</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">HIKMAH <span class="wm-accent">CloudInfra</span></div>
+      <div class="footer-tag">Infrastructure Intelligence for Platform Engineers. Curated weekly by an autonomous CrewAI pipeline — fetched, deduplicated, scored, and rendered.</div>
+    </div>
+    <div class="footer-col">
+      <h4>Coverage</h4>
+<div>Cloud Platforms</div><div>Containers &amp; Kubernetes</div><div>Databases &amp; Storage</div><div>Edge, CDN &amp; Telecom Cloud</div>    </div>
+    <div class="footer-col">
+      <h4>Issue</h4>
+      <div>#005 · Vol. I</div>
+      <div>22 Jun 2026</div>
+      <div>Global Edition</div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 HIKMAH CloudInfra · Muhammad Tahir Riaz</div>
+    <div>trmtelcocloudai.com</div>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

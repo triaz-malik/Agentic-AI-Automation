@@ -1,0 +1,20 @@
+# secrets
+**/config/.env
+
+# generated output
+**/output/*.html
+**/output/*.pdf
+**/output/payload_*.json
+
+# databases
+**/*.db
+
+# logs
+**/logs/*.log
+*.log
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/

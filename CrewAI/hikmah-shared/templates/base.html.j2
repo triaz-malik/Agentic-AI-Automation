@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ brand.product_name }} — {{ brand.eyebrow }} · Issue #{{ "%03d"|format(issue_number) }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --obs:#0A0E17;--obs2:#111827;--obs3:#1C2535;--obs4:#232E42;
+  /* Brand palette (per project) */
+  --pu:{{ brand.primary }};--pu2:{{ brand.primary_dark }};--pu3:{{ brand.primary_bg }};
+  --co:{{ brand.accent }};--co2:{{ brand.accent_dark }};
+  --white:#F4F6FA;--body-bg:#F0F2F7;--card:#FFFFFF;
+  --slate:#8892A4;--slate2:#B8C2CF;
+  --ink:#1A2233;--ink2:#3D4C63;--red:#FF4D6D;
+  --s1:#7C3AED;--s1-bg:#F5F3FF;--s1-b:#DDD6FE;
+  --s2:#DC2626;--s2-bg:#FEF2F2;--s2-b:#FECACA;
+  --s3:#059669;--s3-bg:#ECFDF5;--s3-b:#A7F3D0;
+  --s4:#2563EB;--s4-bg:#EFF6FF;--s4-b:#BFDBFE;
+  --radius:6px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--body-bg);font-family:'Space Grotesk',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6;}
+a{color:inherit;text-decoration:none;}
+.wrap-outer{max-width:{{ '480px' if variant == 'mobile' else '1280px' }};margin:0 auto;background:var(--body-bg);box-shadow:0 0 60px rgba(0,0,0,.06);}
+
+/* ticker */
+.ticker-bar{background:var(--pu);height:32px;overflow:hidden;display:flex;align-items:center;position:sticky;top:0;z-index:100;}
+.ticker-label{background:var(--obs);color:var(--pu);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;padding:0 14px;height:100%;display:flex;align-items:center;flex-shrink:0;}
+.ticker-track{display:flex;animation:ticker 44s linear infinite;white-space:nowrap;}
+.ticker-item{font-size:11px;font-weight:600;letter-spacing:.04em;padding:0 28px;display:flex;align-items:center;gap:10px;color:#fff;}
+.tdot{width:5px;height:5px;border-radius:50%;background:#fff;opacity:.4;flex-shrink:0;}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* masthead */
+.masthead{position:relative;overflow:hidden;background:var(--obs);}
+.masthead-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;{{ 'display:none;' if variant == 'mobile' else '' }}}
+.masthead-overlay{position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 40% 45%,color-mix(in srgb,var(--pu) 8%,transparent) 0%,transparent 60%),
+             radial-gradient(ellipse 35% 55% at 80% 55%,color-mix(in srgb,var(--co) 6%,transparent) 0%,transparent 55%),
+             linear-gradient(180deg,rgba(10,14,23,.2) 0%,rgba(10,14,23,.85) 72%,var(--obs) 100%);
+  pointer-events:none;z-index:1;}
+.masthead-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:{{ '28px 20px 0' if variant == 'mobile' else '48px 48px 0' }};}
+.meta-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:{{ '24px' if variant == 'mobile' else '40px' }};flex-wrap:wrap;gap:12px;}
+.meta-left{display:flex;align-items:center;gap:18px;}
+.issue-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.18em;color:var(--pu);padding:5px 12px;border:1px solid var(--pu2);border-radius:2px;background:color-mix(in srgb,var(--pu) 6%,transparent);}
+.meta-sep{width:1px;height:16px;background:var(--obs3);}
+.meta-date{font-size:12px;color:var(--slate);letter-spacing:.06em;text-transform:uppercase;}
+.meta-right{display:flex;align-items:center;gap:12px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 0 rgba(34,197,94,.5);animation:pulse 2s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.45);}70%{box-shadow:0 0 0 8px rgba(34,197,94,0);}100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}}
+.live-label{font-size:11px;font-weight:600;color:#22C55E;letter-spacing:.08em;text-transform:uppercase;}
+.edition-tag{font-size:11px;color:var(--slate);letter-spacing:.04em;{{ 'display:none;' if variant == 'mobile' else '' }}}
+.wordmark-block{margin-bottom:{{ '8px' if variant == 'mobile' else '14px' }};}
+.wordmark-eyebrow{font-family:'JetBrains Mono',monospace;font-size:{{ '10px' if variant == 'mobile' else '11px' }};letter-spacing:.22em;text-transform:uppercase;color:var(--pu);margin-bottom:10px;}
+.wordmark-main{font-family:'Playfair Display',serif;font-weight:900;font-size:{{ 'clamp(38px,12vw,56px)' if variant == 'mobile' else 'clamp(54px,7vw,104px)' }};line-height:.92;color:var(--white);display:flex;align-items:baseline;gap:{{ '0' if variant == 'mobile' else '18px' }};{{ 'flex-direction:column;' if variant == 'mobile' else '' }}}
+.wordmark-main .wm-accent{font-style:italic;color:var(--pu);font-weight:700;}
+.wordmark-sub{display:flex;align-items:center;gap:16px;margin-top:14px;{{ 'display:none;' if variant == 'mobile' else '' }}}
+.wordmark-sub span:nth-child(2){font-size:13px;color:var(--slate2);letter-spacing:.04em;}
+.wm-rule,.wm-rule-r{height:1px;background:linear-gradient(90deg,transparent,var(--obs4),transparent);flex:1;}
+.stats-strip{display:grid;grid-template-columns:repeat({{ '2' if variant == 'mobile' else '4' }},1fr);gap:1px;background:var(--obs3);margin-top:{{ '24px' if variant == 'mobile' else '34px' }};border:1px solid var(--obs3);border-radius:var(--radius);overflow:hidden;}
+.stat-cell{background:var(--obs2);padding:{{ '13px 15px' if variant == 'mobile' else '18px 22px' }};-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:{{ '22px' if variant == 'mobile' else '30px' }};font-weight:500;color:var(--white);display:flex;align-items:baseline;gap:4px;}
+.stat-unit{font-size:12px;color:var(--pu);font-weight:500;}
+.stat-label{font-size:10px;color:var(--slate);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;}
+
+/* section nav (desktop) */
+.section-nav{display:{{ 'none' if variant == 'mobile' else 'flex' }};gap:4px;padding:0 48px;background:var(--obs);position:relative;z-index:2;border-top:1px solid var(--obs3);}
+.nav-item{display:flex;align-items:center;gap:8px;padding:16px 18px;font-size:12px;font-weight:600;color:var(--slate2);border-bottom:2px solid transparent;transition:all .18s;}
+.nav-item:hover{color:var(--white);}
+.nav-item.active{color:var(--pu);border-bottom-color:var(--pu);}
+.nav-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--slate);}
+.nav-chip{font-size:9px;background:var(--obs3);color:var(--slate2);padding:2px 7px;border-radius:10px;}
+
+/* mobile pills */
+.mobile-pills{display:{{ 'flex' if variant == 'mobile' else 'none' }};gap:8px;overflow-x:auto;padding:14px 20px;background:var(--obs2);border-top:1px solid var(--obs3);}
+.mobile-pill{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:7px 13px;border-radius:20px;background:var(--obs3);color:var(--slate2);border:1px solid transparent;white-space:nowrap;}
+.mobile-pill.active{background:color-mix(in srgb,var(--pu) 14%,transparent);border-color:var(--pu2);color:var(--pu);}
+.header-rule{height:3px;background:linear-gradient(90deg,var(--pu),var(--co));}
+
+/* content */
+.content-wrap{max-width:1280px;margin:0 auto;padding:{{ '24px 16px 0' if variant == 'mobile' else '44px 48px 0' }};}
+.section-block{margin-bottom:{{ '40px' if variant == 'mobile' else '56px' }};scroll-margin-top:60px;}
+.section-header{display:flex;align-items:flex-start;gap:18px;padding:18px 22px;border-radius:var(--radius);margin-bottom:24px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.sh-s1{background:var(--s1-bg);border-left:4px solid var(--s1);}
+.sh-s2{background:var(--s2-bg);border-left:4px solid var(--s2);}
+.sh-s3{background:var(--s3-bg);border-left:4px solid var(--s3);}
+.sh-s4{background:var(--s4-bg);border-left:4px solid var(--s4);}
+.section-num{font-family:'JetBrains Mono',monospace;font-size:{{ '28px' if variant == 'mobile' else '40px' }};font-weight:500;color:var(--ink);opacity:.18;line-height:1;}
+.section-title-block{flex:1;}
+.section-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);opacity:.75;margin-bottom:4px;}
+.section-title{font-family:'Playfair Display',serif;font-weight:700;font-size:{{ '22px' if variant == 'mobile' else '28px' }};color:var(--ink);}
+.section-meta{font-size:11px;color:var(--ink2);opacity:.7;margin-top:4px;}
+.section-count-badge{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);background:rgba(0,0,0,.05);padding:6px 12px;border-radius:14px;white-space:nowrap;}
+.entry-grid{display:grid;grid-template-columns:{{ '1fr' if variant == 'mobile' else 'repeat(2,1fr)' }};gap:18px;}
+
+.entry-card{background:var(--card);border:1px solid #E3E8F0;border-radius:var(--radius);padding:{{ '18px 16px 16px 20px' if variant == 'mobile' else '22px 22px 18px 26px' }};position:relative;break-inside:avoid;page-break-inside:avoid;}
+.ec-s1{border-left:4px solid var(--s1);}.ec-s2{border-left:4px solid var(--s2);}
+.ec-s3{border-left:4px solid var(--s3);}.ec-s4{border-left:4px solid var(--s4);}
+.entry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.logo-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.logo-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--ink2);background:#F1F4F9;border:1px solid #E3E8F0;padding:4px 9px;border-radius:4px;}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--pu);}
+.entry-source-link{text-align:right;flex-shrink:0;}
+.source-name{font-size:11px;font-weight:600;color:var(--ink2);}
+.source-date{font-size:10px;color:var(--slate);font-family:'JetBrains Mono',monospace;}
+.source-arrow{font-size:10px;color:var(--pu);font-weight:600;}
+.entry-headline{font-weight:700;font-size:{{ '15px' if variant == 'mobile' else '17px' }};line-height:1.35;color:var(--ink);margin-bottom:10px;}
+.entry-summary{font-size:13.5px;color:var(--ink2);line-height:1.6;margin-bottom:12px;}
+.keyword-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.kpill{font-size:10px;font-weight:500;color:var(--ink2);background:#F1F4F9;border:1px solid #E3E8F0;padding:3px 8px;border-radius:3px;}
+.kpill-s1{background:var(--s1-bg);border-color:var(--s1-b);color:var(--s1);}
+.kpill-s2{background:var(--s2-bg);border-color:var(--s2-b);color:var(--s2);}
+.kpill-s3{background:var(--s3-bg);border-color:var(--s3-b);color:var(--s3);}
+.kpill-s4{background:var(--s4-bg);border-color:var(--s4-b);color:var(--s4);}
+.arch-signal{display:flex;gap:10px;padding:12px 14px;border-radius:var(--radius);margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.asc-s1{background:var(--s1-bg);}.asc-s2{background:var(--s2-bg);}.asc-s3{background:var(--s3-bg);}.asc-s4{background:var(--s4-bg);}
+.as-icon{font-size:16px;line-height:1.3;}
+.as-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);opacity:.7;margin-bottom:3px;}
+.as-text{font-size:12.5px;color:var(--ink2);line-height:1.55;}
+.entry-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;}
+.read-more{font-size:12px;font-weight:600;color:var(--pu);}
+.score-badge{display:flex;align-items:center;gap:8px;}
+.score-bar{width:54px;height:5px;background:#E3E8F0;border-radius:3px;overflow:hidden;}
+.score-fill{height:100%;border-radius:3px;}
+.sf-s1{background:var(--s1);}.sf-s2{background:var(--s2);}.sf-s3{background:var(--s3);}.sf-s4{background:var(--s4);}
+.score-badge span{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--ink2);}
+
+/* footer */
+.site-footer{background:var(--obs);color:var(--slate2);padding:{{ '32px 20px 24px' if variant == 'mobile' else '44px 48px 32px' }};margin-top:40px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.footer-top{display:grid;grid-template-columns:{{ '1fr' if variant == 'mobile' else '2fr 1fr 1fr' }};gap:{{ '24px' if variant == 'mobile' else '40px' }};padding-bottom:28px;border-bottom:1px solid var(--obs3);}
+.footer-brand{font-family:'Playfair Display',serif;font-weight:900;font-size:24px;color:var(--white);}
+.footer-brand .wm-accent{font-style:italic;color:var(--pu);}
+.footer-tag{font-size:12px;color:var(--slate);margin-top:8px;line-height:1.6;max-width:340px;}
+.footer-col h4{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--pu);margin-bottom:12px;}
+.footer-col a,.footer-col div{display:block;font-size:12px;color:var(--slate2);margin-bottom:8px;}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:20px;font-size:11px;color:var(--slate);flex-wrap:wrap;}
+.hosted-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.hosted-links a{font-size:11px;font-weight:600;padding:7px 14px;border-radius:3px;border:1px solid var(--pu2);color:var(--pu);}
+
+@media print{
+  .ticker-bar,.section-nav,.mobile-pills{display:none !important;}
+  .masthead-canvas{display:none !important;}
+  .read-more,.hosted-links{display:none !important;}
+  body{background:#fff !important;}
+  .entry-card{break-inside:avoid;}
+}
+</style>
+</head>
+<body class="variant-{{ variant }}">
+<div class="wrap-outer">
+
+{% if ticker_items %}
+<div class="ticker-bar">
+  <div class="ticker-label">{{ brand.ticker_label }}</div>
+  <div style="overflow:hidden;flex:1;">
+    <div class="ticker-track">
+      {% for item in ticker_items + ticker_items %}
+      <div class="ticker-item"><span class="tdot"></span>{{ item }}</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<header class="masthead" role="banner">
+  <svg class="masthead-canvas" viewBox="0 0 1440 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><filter id="b7"><feGaussianBlur stdDeviation="7"/></filter></defs>
+    <ellipse cx="500" cy="210" rx="380" ry="200" fill="color-mix(in srgb,{{ brand.primary }} 6%,transparent)" filter="url(#b7)"/>
+    <ellipse cx="1050" cy="200" rx="300" ry="160" fill="color-mix(in srgb,{{ brand.accent }} 5%,transparent)" filter="url(#b7)"/>
+    {% for y in [100,150,210,270,320] %}
+    <line x1="120" y1="{{ y }}" x2="1320" y2="{{ y }}" stroke="{{ brand.primary }}" stroke-opacity=".14" stroke-width="1"/>
+    {% endfor %}
+    {% for x in [320,560,800,1040,1200] %}
+    <line x1="{{ x }}" y1="100" x2="{{ x }}" y2="320" stroke="{{ brand.primary }}" stroke-opacity=".10" stroke-width="1"/>
+    <circle cx="{{ x }}" cy="210" r="5" fill="{{ brand.primary }}" opacity=".8"/>
+    {% endfor %}
+  </svg>
+  <div class="masthead-overlay"></div>
+  <div class="masthead-inner">
+    <div class="meta-row">
+      <div class="meta-left">
+        <div class="issue-badge">Issue #{{ "%03d"|format(issue_number) }}</div>
+        <div class="meta-sep"></div>
+        <div class="meta-date">{{ issue_date }} &nbsp;·&nbsp; Vol. {{ volume }}</div>
+      </div>
+      <div class="meta-right">
+        <div class="live-dot"></div>
+        <div class="live-label">Live</div>
+        <div class="edition-tag">{{ edition }} &nbsp;·&nbsp; {{ stats.articles_published }} Articles Curated</div>
+      </div>
+    </div>
+    <div class="wordmark-block">
+      <div class="wordmark-eyebrow">{{ brand.eyebrow }}</div>
+      <div class="wordmark-main"><span>{{ brand.wordmark_main }}</span><span class="wm-accent">{{ brand.wordmark_accent }}</span></div>
+      <div class="wordmark-sub"><span class="wm-rule"></span><span>{{ brand.tagline }}</span><span class="wm-rule-r"></span></div>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-cell"><div class="stat-num">{{ stats.articles_published }}<span class="stat-unit">art.</span></div><div class="stat-label">Articles Curated</div></div>
+      <div class="stat-cell"><div class="stat-num">{{ stats.sources_scanned }}<span class="stat-unit">src</span></div><div class="stat-label">Sources Scanned</div></div>
+      <div class="stat-cell"><div class="stat-num">{{ stats.duplicates_removed }}<span class="stat-unit">dup</span></div><div class="stat-label">Duplicates Removed</div></div>
+      <div class="stat-cell"><div class="stat-num">{{ sections|length }}<span class="stat-unit">sec</span></div><div class="stat-label">Coverage Domains</div></div>
+    </div>
+  </div>
+  <nav class="section-nav">
+    {% for sec in sections %}
+    <a class="nav-item {{ 'active' if loop.first else '' }}" href="#{{ sec.id }}"><span class="nav-num">{{ sec.number }}</span>{{ sec.title }}<span class="nav-chip">{{ sec.entries|length }}</span></a>
+    {% endfor %}
+  </nav>
+</header>
+
+<div class="mobile-pills">
+  {% for sec in sections %}
+  <button class="mobile-pill {{ 'active' if loop.first else '' }}">{{ sec.number }} · {{ sec.title }}</button>
+  {% endfor %}
+</div>
+<div class="header-rule"></div>
+
+<main class="content-wrap">
+{% for sec in sections %}
+  <section class="section-block" id="{{ sec.id }}">
+    <div class="section-header sh-{{ sec.color_class }}">
+      <div class="section-num">{{ sec.number }}</div>
+      <div class="section-title-block">
+        <div class="section-eyebrow">{{ sec.eyebrow }}</div>
+        <div class="section-title">{{ sec.title }}</div>
+        <div class="section-meta">{{ sec.meta }}</div>
+      </div>
+      <div class="section-count-badge">{{ sec.entries|length }} entries</div>
+    </div>
+    <div class="entry-grid">
+    {% for e in sec.entries %}
+      <article class="entry-card ec-{{ sec.color_class }}">
+        <div class="entry-top">
+          <div class="logo-chips">
+            {% for v in (e.vendors or [e.source])[:2] %}
+            <span class="logo-chip"><span class="chip-dot"></span>{{ v }}</span>
+            {% endfor %}
+          </div>
+          <a href="{{ e.url }}" target="_blank" rel="noopener" class="entry-source-link">
+            <div class="source-name">{{ e.source }}</div>
+            <div class="source-date">{{ e.date }}</div>
+            <div class="source-arrow">↗ source</div>
+          </a>
+        </div>
+        <div class="entry-headline">{{ e.title }}</div>
+        <div class="entry-summary">{{ e.summary }}</div>
+        {% if e.keywords %}
+        <div class="keyword-pills">
+          {% for k in e.keywords[:5] %}
+          <span class="kpill {{ 'kpill-' + sec.color_class if loop.index <= 2 else '' }}">{{ k }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if e.arch_impact %}
+        <div class="arch-signal asc-{{ sec.color_class }}">
+          <div class="as-icon">{{ brand.icons[sec.color_class] if brand.icons and sec.color_class in brand.icons else '▸' }}</div>
+          <div>
+            <div class="as-label">Signal</div>
+            <div class="as-text">{{ e.arch_impact }}</div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="entry-footer">
+          <a href="{{ e.url }}" target="_blank" rel="noopener" class="read-more">Read full article →</a>
+          <div class="score-badge"><div class="score-bar"><div class="score-fill sf-{{ sec.color_class }}" style="width:{{ e.score }}%"></div></div><span>{{ e.score }}</span></div>
+        </div>
+      </article>
+    {% endfor %}
+    </div>
+  </section>
+{% endfor %}
+</main>
+
+<footer class="site-footer">
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">{{ brand.wordmark_main }} <span class="wm-accent">{{ brand.wordmark_accent }}</span></div>
+      <div class="footer-tag">{{ brand.tagline }}. Curated weekly by an autonomous CrewAI pipeline — fetched, deduplicated, scored, and rendered.</div>
+      {% if pdf_url or archive_url %}
+      <div class="hosted-links">
+        {% if pdf_url %}<a href="{{ pdf_url }}">↓ Download PDF</a>{% endif %}
+        {% if archive_url %}<a href="{{ archive_url }}">📁 All Issues</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="footer-col">
+      <h4>Coverage</h4>
+      {% for sec in sections %}<div>{{ sec.title }}</div>{% endfor %}
+    </div>
+    <div class="footer-col">
+      <h4>Issue</h4>
+      <div>#{{ "%03d"|format(issue_number) }} · Vol. {{ volume }}</div>
+      <div>{{ issue_date }}</div>
+      <div>{{ edition }}</div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© {{ issue_date.split(' ')[-1] }} {{ brand.product_name }} · {{ brand.owner }}</div>
+    <div>{{ brand.website }}</div>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

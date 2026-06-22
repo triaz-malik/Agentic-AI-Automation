@@ -1,0 +1,32 @@
+
+# HIKMAH Suite — Five Independent CrewAI Newsletter Projects
+# ==========================================================
+# Owner: Muhammad Tahir Riaz · trmtelcocloudai.com
+#
+# Full docs + run instructions: see README.md
+#
+# PROJECT 1: hikmah-signal/        -> Telecom / 5G / RAN              · Tue 06:00 GST
+# PROJECT 2: hikmah-intelligence/  -> AI / Agentic / LLM             · Wed 06:00 GST
+# PROJECT 3: hikmah-dataml/        -> MLOps / DS / Analytics         · Thu 06:00 GST
+# PROJECT 4: hikmah-cloudinfra/    -> Cloud / Containers / Edge      · Fri 06:00 GST
+# PROJECT 5: hikmah-dataarch/      -> Databases / BigData / GPU/API  · Sat 06:00 GST
+#
+# Each project is 100% self-contained:
+#   - its own crew.py (domain agents + RSS feeds)
+#   - its own SQLite dedup DB
+#   - its own brand.py (colours, wordmark, section taxonomy)
+#   - its own templates/ stub (extends the shared hikmah-shared/templates/base.html.j2)
+#   - its own config/.env (separate ISSUE_NUMBER counter)
+#   - its own output/ and logs/
+#
+# Every run emits SEPARATE files per device:
+#   output/issue_NNN_desktop.html   output/issue_NNN_desktop.pdf   (A4)
+#   output/issue_NNN_mobile.html    output/issue_NNN_mobile.pdf    (phone)
+#
+# Shared code lives in hikmah-shared/ and is imported by all five.
+#
+# RUN:
+#   AUTO    python run_all.py                 (5 weekly schedulers, blocks)
+#           python hikmah-<proj>/scheduler.py (one project's weekly cron)
+#   MANUAL  python run_now.py <proj|all>      (on demand: crew->render->publish->email)
+#   PREVIEW python run_now.py <proj|all> --demo   (offline, no API key)
