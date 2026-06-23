@@ -17,17 +17,19 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-intelligence.crew")
 
 RSS_FEEDS = [
-    # AI / Agentic / LLM
+    # AI · Agentic · LLM · Research · Strategy
     "https://huggingface.co/blog/feed.xml",
     "https://openai.com/news/rss.xml",
     "https://deepmind.google/blog/rss.xml",
     "https://blog.google/technology/ai/rss/",
-    "https://machinelearning.apple.com/rss.xml",
-    "https://bair.berkeley.edu/blog/feed.xml",
     "https://www.marktechpost.com/feed/",
     "https://venturebeat.com/category/ai/feed/",
-    "https://thegradient.pub/rss/",
-    "https://simonwillison.net/atom/everything/",
+    "https://www.oneusefulthing.org/feed",
+    "https://www.interconnects.ai/feed",
+    "https://magazine.sebastianraschka.com/feed",
+    "https://semianalysis.com/feed/",
+    "https://stratechery.com/feed/",
+    "https://www.technologyreview.com/feed/",
 ]
 
 _DB_PATH = "ai_news.db"
@@ -41,11 +43,11 @@ def fetch_rss_ai(unused: str = "") -> str:
         try:
             p = feedparser.parse(url)
             src = p.feed.get("title", url)
-            for e in p.entries[:15]:
+            for e in p.entries[:6]:
                 articles.append({
                     "title":     e.get("title","").strip(),
                     "url":       e.get("link","").strip(),
-                    "summary":   e.get("summary","")[:500],
+                    "summary":   e.get("summary","")[:300],
                     "published": e.get("published", datetime.utcnow().isoformat()),
                     "source":    src,
                 })
@@ -94,14 +96,27 @@ scout = Agent(
 )
 
 analyst = Agent(
-    role="AI Research Analyst",
+    role="Principal Analyst & Technology Strategist",
     goal=(
-        "Score each article 0-100 for strategic importance to GCC AI leads. "
-        "Drop score < 60. Write: summary (3 sentences), "
-        "strategic_signal (2 sentences — concrete implication for AI architects), "
-        "keywords (3-5), vendors/orgs (names). Keep top 6 per section."
+        "Audience: SENIOR engineers, principal architects, technical consultants and "
+        "executives (CTO/VP Engineering). Assume deep expertise -- never explain "
+        "fundamentals or write for juniors. "
+        "Score each article 0-100 for strategic and technical significance to that "
+        "audience; DROP anything below 65. For each kept item write: "
+        "summary -- exactly 3 tight sentences that lead with what actually changed and "
+        "why it is significant, with no filler and no 101-level explanation. "
+        "arch_impact -- 2-3 sentences of decision-grade insight fusing the architectural "
+        "implication with the strategic and business consequence: adoption timing, cost, "
+        "risk, competitive positioning, and the concrete move a senior leader should make. "
+        "This is the headline takeaway; make it sharp, specific and non-obvious. "
+        "Extract 3-5 real technical keywords and the vendors named. "
+        "Keep only the strongest 6 entries per section, ordered by score."
     ),
-    backstory="AI solutions architect with GCC enterprise deployment experience.",
+    backstory=(
+        "A principal architect and technology strategist who briefs CTOs and senior "
+        "engineering leaders, turning raw technical developments into architecture "
+        "decisions and business strategy."
+    ),
     llm=SONNET,
     verbose=True, max_iter=4,
 )

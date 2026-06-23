@@ -17,15 +17,18 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-cloudinfra.crew")
 
 RSS_FEEDS = [
-    # Cloud / Containers / Edge
+    # Cloud · Containers · Platform · Edge · Strategy
     "https://aws.amazon.com/blogs/aws/feed/",
     "https://azure.microsoft.com/en-us/blog/feed/",
+    "https://cloudblog.withgoogle.com/rss/",
     "https://kubernetes.io/feed.xml",
     "https://www.cncf.io/feed/",
     "https://www.docker.com/blog/feed/",
     "https://blog.cloudflare.com/rss/",
     "https://www.hashicorp.com/blog/feed.xml",
-    "https://istio.io/latest/blog/feed.xml",
+    "https://www.allthingsdistributed.com/atom.xml",
+    "https://netflixtechblog.com/feed",
+    "https://www.redhat.com/en/rss/blog",
     "https://thenewstack.io/feed/",
 ]
 
@@ -40,11 +43,11 @@ def fetch_rss_cloud(unused: str = "") -> str:
         try:
             p = feedparser.parse(url)
             src = p.feed.get("title", url)
-            for e in p.entries[:15]:
+            for e in p.entries[:6]:
                 articles.append({
                     "title":     e.get("title","").strip(),
                     "url":       e.get("link","").strip(),
-                    "summary":   e.get("summary","")[:500],
+                    "summary":   e.get("summary","")[:300],
                     "published": e.get("published", datetime.utcnow().isoformat()),
                     "source":    src,
                 })
@@ -93,17 +96,27 @@ scout = Agent(
 )
 
 analyst = Agent(
-    role="Platform Engineering Analyst",
+    role="Principal Analyst & Technology Strategist",
     goal=(
-        "Score each article 0-100 for production relevance to platform engineers "
-        "and cloud architects, with extra weight for GCC/telecom relevance. "
-        "Drop score < 60. Write: summary (3 sentences), "
-        "infra_impact (2 sentences — concrete operational or cost implication), "
-        "keywords (3-5 tags), vendors (platform/tool names). "
-        "Icon prefix by section: ☁️ Cloud 📦 Containers 🗃️ Database 🌐 Edge. "
-        "Keep top 6 per section by score."
+        "Audience: SENIOR engineers, principal architects, technical consultants and "
+        "executives (CTO/VP Engineering). Assume deep expertise -- never explain "
+        "fundamentals or write for juniors. "
+        "Score each article 0-100 for strategic and technical significance to that "
+        "audience; DROP anything below 65. For each kept item write: "
+        "summary -- exactly 3 tight sentences that lead with what actually changed and "
+        "why it is significant, with no filler and no 101-level explanation. "
+        "arch_impact -- 2-3 sentences of decision-grade insight fusing the architectural "
+        "implication with the strategic and business consequence: adoption timing, cost, "
+        "risk, competitive positioning, and the concrete move a senior leader should make. "
+        "This is the headline takeaway; make it sharp, specific and non-obvious. "
+        "Extract 3-5 real technical keywords and the vendors named. "
+        "Keep only the strongest 6 entries per section, ordered by score."
     ),
-    backstory="Principal platform engineer, AWS SAP-C02, Kubernetes certified, GCC enterprise experience.",
+    backstory=(
+        "A principal architect and technology strategist who briefs CTOs and senior "
+        "engineering leaders, turning raw technical developments into architecture "
+        "decisions and business strategy."
+    ),
     llm=SONNET,
     verbose=True, max_iter=4,
 )
