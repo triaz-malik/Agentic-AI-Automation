@@ -42,11 +42,21 @@ Projects (folder · domain · weekday 06:00 GST):
   `GITHUB_REPO_PATH`, `GITHUB_PAGES_BASE`, SMTP/email recipients, `DB_PATH`).
 - NEVER hardcode keys or commit any `.env` / `.env.txt` / `*.db`.
 
+## Environment
+- Use the project venv `CrewAI/.venv` (has crewai + playwright + chromium). The
+  workspace sets it as the default interpreter; in a terminal call
+  `.\.venv\Scripts\python.exe ...` or activate it. The base conda env lacks
+  Playwright, so PDFs only generate under the venv.
+- On Windows, `PYTHONUTF8=1` (set in the workspace terminal env) silences crewai's
+  cosmetic emoji/charmap warnings.
+
 ## Run
 - Offline preview (no API key): `python run_now.py all --demo`
 - Manual full run: `python run_now.py <project>`  (or `--dry-run` for local-only)
 - Auto (weekly schedulers): `python run_all.py`
 - Single project cron: `cd <project> && python scheduler.py`
+- LLM routing: model strings MUST keep the `anthropic/` prefix or crewai 1.x
+  misroutes them to the OpenAI provider (404).
 
 ## Payload schema (what `crew.py` returns / `--demo` fabricates)
 ```
