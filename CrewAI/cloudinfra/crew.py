@@ -17,7 +17,7 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-cloudinfra.crew")
 
 RSS_FEEDS = [
-    # Cloud · Containers · Platform · Edge · Strategy
+    # Cloud · Containers · Platform · Observability · Edge · Strategy
     "https://aws.amazon.com/blogs/aws/feed/",
     "https://azure.microsoft.com/en-us/blog/feed/",
     "https://cloudblog.withgoogle.com/rss/",
@@ -30,6 +30,12 @@ RSS_FEEDS = [
     "https://netflixtechblog.com/feed",
     "https://www.redhat.com/en/rss/blog",
     "https://thenewstack.io/feed/",
+    "https://grafana.com/blog/index.xml",
+    "https://istio.io/latest/blog/feed.xml",
+    "https://aws.amazon.com/blogs/containers/feed/",
+    "https://www.gremlin.com/blog/rss.xml",
+    "https://www.datadoghq.com/blog/index.xml",
+    "https://www.elastic.co/blog/feed",
 ]
 
 _DB_PATH = "cloudinfra_news.db"
@@ -43,7 +49,7 @@ def fetch_rss_cloud(unused: str = "") -> str:
         try:
             p = feedparser.parse(url)
             src = p.feed.get("title", url)
-            for e in p.entries[:6]:
+            for e in p.entries[:4]:
                 articles.append({
                     "title":     e.get("title","").strip(),
                     "url":       e.get("link","").strip(),
@@ -76,7 +82,7 @@ def dedup_cloud(articles_json: str = "") -> str:
 
 
 # Explicit token budgets so large JSON payloads are not truncated.
-HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=8000)
+HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=16000)
 SONNET = LLM(model="anthropic/claude-sonnet-4-6", max_tokens=16000)
 
 scout = Agent(

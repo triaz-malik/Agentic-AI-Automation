@@ -17,19 +17,31 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-dataarch.crew")
 
 RSS_FEEDS = [
-    # Databases · Big Data · GPU · API · Architecture
+    # Database Architecture
     "https://neon.tech/blog/rss",
     "https://supabase.com/blog/rss",
     "https://www.pingcap.com/blog/rss",
     "https://www.cockroachlabs.com/blog/rss",
     "https://planetscale.com/blog/rss.xml",
-    "https://developer.nvidia.com/blog/feed",
-    "https://www.databricks.com/feed",
     "https://aws.amazon.com/blogs/database/feed/",
-    "https://martinfowler.com/feed.atom",
-    "https://blog.bytebytego.com/feed",
+    # Big Data & Streaming
+    "https://www.databricks.com/feed",
+    "https://estuary.dev/blog/rss.xml",
+    "https://www.decodable.co/blog/rss.xml",
+    "https://www.dataengineeringweekly.com/feed",
+    "https://www.getdbt.com/blog/rss.xml",
+    "https://www.tinybird.co/blog-posts/rss.xml",
+    "https://materializedview.io/feed",
+    "https://seattledataguy.substack.com/feed",
+    # GPUs & Compute
+    "https://developer.nvidia.com/blog/feed",
+    "https://semianalysis.com/feed/",
+    "https://www.together.ai/blog/rss.xml",
+    # APIs & Automation
     "https://blog.postman.com/feed/",
     "https://konghq.com/feed",
+    "https://blog.bytebytego.com/feed",
+    "https://martinfowler.com/feed.atom",
 ]
 
 _DB_PATH = "dataarch_news.db"
@@ -43,7 +55,7 @@ def fetch_rss_dataarch(unused: str = "") -> str:
         try:
             p = feedparser.parse(url)
             src = p.feed.get("title", url)
-            for e in p.entries[:6]:
+            for e in p.entries[:4]:
                 articles.append({
                     "title":     e.get("title","").strip(),
                     "url":       e.get("link","").strip(),
@@ -76,7 +88,7 @@ def dedup_dataarch(articles_json: str = "") -> str:
 
 
 # Explicit token budgets so large JSON payloads are not truncated.
-HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=8000)
+HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=16000)
 SONNET = LLM(model="anthropic/claude-sonnet-4-6", max_tokens=16000)
 
 scout = Agent(

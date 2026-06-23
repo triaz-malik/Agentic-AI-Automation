@@ -18,16 +18,22 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-signal.crew")
 
 RSS_FEEDS = [
-    # Telecom · Operators · 5G/6G · Networks · Strategy
+    # Telecom · Operators · 5G/6G · Networks · Policy · Strategy
     "https://www.lightreading.com/rss.xml",
     "https://www.fiercewireless.com/rss/xml",
     "https://www.fierce-network.com/rss/xml",
+    "https://www.fiercetelecom.com/rss/xml",
     "https://www.rcrwireless.com/feed",
     "https://www.capacitymedia.com/feed",
     "https://www.totaltele.com/rss",
     "https://www.datacenterdynamics.com/en/rss/",
     "https://www.ericsson.com/en/blog/feed",
     "https://www.theregister.com/networks/headlines.atom",
+    "https://www.nextgov.com/rss/all/",
+    "https://www.telecomlead.com/feed",
+    "https://www.gsma.com/newsroom/feed/",
+    "https://www.opensignal.com/blog/feed",
+    "https://www.networkworld.com/feed/",
 ]
 
 SECTION_NAMES = [
@@ -47,7 +53,7 @@ def fetch_rss(unused: str = "") -> str:
         try:
             p = feedparser.parse(url)
             src = p.feed.get("title", url)
-            for e in p.entries[:6]:
+            for e in p.entries[:4]:
                 articles.append({
                     "title":     e.get("title","").strip(),
                     "url":       e.get("link","").strip(),
@@ -80,7 +86,7 @@ def dedup(articles_json: str = "") -> str:
 
 
 # Explicit token budgets so large JSON payloads are not truncated.
-HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=8000)
+HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=16000)
 SONNET = LLM(model="anthropic/claude-sonnet-4-6", max_tokens=16000)
 
 scout = Agent(

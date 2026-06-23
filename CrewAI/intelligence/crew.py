@@ -17,19 +17,29 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-intelligence.crew")
 
 RSS_FEEDS = [
-    # AI · Agentic · LLM · Research · Strategy
+    # AI · Agentic · LLM · Research · Industry · Strategy
     "https://huggingface.co/blog/feed.xml",
     "https://openai.com/news/rss.xml",
     "https://deepmind.google/blog/rss.xml",
     "https://blog.google/technology/ai/rss/",
+    "https://research.google/blog/rss/",
+    "https://aws.amazon.com/blogs/machine-learning/feed/",
     "https://www.marktechpost.com/feed/",
     "https://venturebeat.com/category/ai/feed/",
+    "https://www.technologyreview.com/feed/",
+    "https://news.mit.edu/rss/topic/artificial-intelligence2",
     "https://www.oneusefulthing.org/feed",
     "https://www.interconnects.ai/feed",
     "https://magazine.sebastianraschka.com/feed",
     "https://semianalysis.com/feed/",
     "https://stratechery.com/feed/",
-    "https://www.technologyreview.com/feed/",
+    "https://bair.berkeley.edu/blog/feed.xml",
+    "https://machinelearning.apple.com/rss.xml",
+    "https://thegradient.pub/rss/",
+    "https://simonwillison.net/atom/everything/",
+    "https://jack-clark.net/feed/",
+    "https://www.latent.space/feed",
+    "https://www.kdnuggets.com/feed",
 ]
 
 _DB_PATH = "ai_news.db"
@@ -43,7 +53,7 @@ def fetch_rss_ai(unused: str = "") -> str:
         try:
             p = feedparser.parse(url)
             src = p.feed.get("title", url)
-            for e in p.entries[:6]:
+            for e in p.entries[:4]:
                 articles.append({
                     "title":     e.get("title","").strip(),
                     "url":       e.get("link","").strip(),
@@ -76,7 +86,7 @@ def dedup_ai(articles_json: str = "") -> str:
 
 
 # Explicit token budgets so large JSON payloads are not truncated.
-HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=8000)
+HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=16000)
 SONNET = LLM(model="anthropic/claude-sonnet-4-6", max_tokens=16000)
 
 scout = Agent(

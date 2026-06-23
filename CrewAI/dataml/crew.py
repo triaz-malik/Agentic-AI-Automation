@@ -17,7 +17,7 @@ from db_manager import filter_new, mark_seen
 logger = logging.getLogger("hikmah-dataml.crew")
 
 RSS_FEEDS = [
-    # MLOps · ML · Data Science · Engineering
+    # MLOps · ML · Deep Learning · Data Science · Engineering
     "https://huggingface.co/blog/feed.xml",
     "https://www.kdnuggets.com/feed",
     "https://machinelearningmastery.com/blog/feed/",
@@ -28,6 +28,8 @@ RSS_FEEDS = [
     "https://engineering.fb.com/feed/",
     "https://aws.amazon.com/blogs/machine-learning/feed/",
     "https://magazine.sebastianraschka.com/feed",
+    "https://huyenchip.com/feed.xml",
+    "https://www.dataengineeringweekly.com/feed",
 ]
 
 _DB_PATH = "dataml_news.db"
@@ -41,7 +43,7 @@ def fetch_rss_dataml(unused: str = "") -> str:
         try:
             p = feedparser.parse(url)
             src = p.feed.get("title", url)
-            for e in p.entries[:6]:
+            for e in p.entries[:4]:
                 articles.append({
                     "title":     e.get("title","").strip(),
                     "url":       e.get("link","").strip(),
@@ -74,7 +76,7 @@ def dedup_dataml(articles_json: str = "") -> str:
 
 
 # Explicit token budgets so large JSON payloads are not truncated.
-HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=8000)
+HAIKU  = LLM(model="anthropic/claude-haiku-4-5",  max_tokens=16000)
 SONNET = LLM(model="anthropic/claude-sonnet-4-6", max_tokens=16000)
 
 scout = Agent(
